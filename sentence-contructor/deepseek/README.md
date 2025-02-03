@@ -26,3 +26,14 @@ For tackling out of scope sections I included this line:
 
 This helped when asking the assistant to write a python program:
 ![offTopicHack.png](img/offTopicHack.png) 
+
+## Models used
+
+Using the prompt worked perfectly on the deepseek chat (https://chat.deepseek.com/).
+I also attempted running Deepseek locally with Ollama and an M1 Macbook Pro with 16 gigs of RAM.
+
+Initially I tried the 7b model, but that wasn't smart enough and it accepted any translation as correct. It also sometimes misunderstood the prompt to mean that they should suggest a game for a teacher.
+
+I tried then the 14b model, which is runnable on this hardware, but just *barely*. RAM usage is through the roof and the responses aren't the fastest. This model on first look performed better and they understood the translations properly. But the guardrails were not working and it failed the "generate a python hello world program" test.
+
+Using further models is not possible locally as I don't have more compute at hand. I will check if tweaking the prompt will produce better results with this (much) smaller model than what chat.deepseek.com is working with.
