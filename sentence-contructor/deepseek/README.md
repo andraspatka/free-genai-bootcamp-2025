@@ -34,6 +34,15 @@ I also attempted running Deepseek locally with Ollama and an M1 Macbook Pro with
 
 Initially I tried the 7b model, but that wasn't smart enough and it accepted any translation as correct. It also sometimes misunderstood the prompt to mean that they should suggest a game for a teacher.
 
-I tried then the 14b model, which is runnable on this hardware, but just *barely*. RAM usage is through the roof and the responses aren't the fastest. This model on first look performed better and they understood the translations properly. But the guardrails were not working and it failed the "generate a python hello world program" test.
+I tried then the 14b model, which is runnable on this hardware, but just *barely*. RAM usage is through the roof and the responses aren't the fastest. This model on first look performed better and they understood the translations properly. But the guardrails were not working and it failed the "generate a python hello world program" hacking attempt.
 
 Using further models is not possible locally as I don't have more compute at hand. I will check if tweaking the prompt will produce better results with this (much) smaller model than what chat.deepseek.com is working with.
+
+## Splitting up the prompt and using multiple LLMs
+
+I attempted to split the prompts into multiple smaller ones to experiment if smaller LLMs can do a smaller chunk of the work.
+
+I've split up the prompt into these tasks:
+- [Generate a sentence](prompt_split/Prompt_s_sentence_gen.md)
+- [Validate the translation](prompt_split/Prompt_s_translation_validator.md)
+- [Scoring and hints system](prompt_split/Prompt_s_scoring_and_hints.md)
