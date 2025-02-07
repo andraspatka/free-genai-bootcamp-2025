@@ -45,4 +45,15 @@ I attempted to split the prompts into multiple smaller ones to experiment if sma
 I've split up the prompt into these tasks:
 - [Generate a sentence](prompt_split/Prompt_s_sentence_gen.md)
 - [Validate the translation](prompt_split/Prompt_s_translation_validator.md)
-- [Scoring and hints system](prompt_split/Prompt_s_scoring_and_hints.md)
+- [Scoring system](prompt_split/Prompt_s_scoring.md)
+- [Hint system](prompt_split/Prompt_s_hints.md)
+- [Orchestrator system](prompt_split/Prompt_s_orchestrator.md)
+
+These different prompts could be tied together using an application and this set logic:
+1. Call the sentence generator. This generates a random English sentence and gives it to the user
+2. The user then can decide what they do. Their input go to the orchestrator
+    1. If they ask for a hint, then their input goes to the Hint system
+    2. If they answer in Italian, then their input goes to the Validator system.
+        1. If the translation is correct, the input goes to the scoring system along with the amount of hints used and amount of attempts used
+        2. If the translation is incorrect, the attempt is recorded and the user is prompted again
+    3. If they answer 3 times in Italian, then their input goes to the Scoring system
