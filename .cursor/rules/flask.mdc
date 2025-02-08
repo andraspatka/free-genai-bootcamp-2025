@@ -1,0 +1,65 @@
+---
+description: Rules for flask code
+globs: backend-flask/*.py
+---
+
+# Your rule content
+
+1. Always Use Application Factories
+```
+# BAD - Global app variable
+app = Flask(__name__)
+
+# GOOD - Use an application factory
+def create_app():
+    app = Flask(__name__)
+    # Configure your app here
+    return app
+```
+
+This pattern makes testing easier, prevents circular imports, and allows for multiple instances of your app with different configurations.
+2. Structure Your Routes with Blueprints
+```
+# BAD - All routes in one file
+@app.route('/')
+def home():
+    return 'Home'
+
+# GOOD - Use blueprints
+from flask import Blueprint
+
+main = Blueprint('main', __name__)
+
+@main.route('/')
+def home():
+    return 'Home'
+
+# In your app factory:
+app.register_blueprint(main)
+```
+
+Blueprints help organize your code into logical components and make it more maintainable.
+3. Always Handle Errors Properly
+```
+# BAD - No error handling
+@app.route('/user/<id>')
+def get_user(id):
+    user = User.query.get(id)
+    return jsonify(user.to_dict())
+
+# GOOD - Proper error handling
+from flask import abort
+
+@app.route('/user/<id>')
+def get_user(id):
+    user = User.query.get(id)
+    if not user:
+        abort(404)
+    return jsonify(user.to_dict())
+
+@app.errorhandler(404)
+def not_found_error(error):
+    return jsonify({'error': 'Resource not found'}), 404
+```
+Always anticipate and handle potential errors to provide better user experience and make debugging easier.
+These rules will help you write more maintainable, testable, and robust Flask applications from the start.

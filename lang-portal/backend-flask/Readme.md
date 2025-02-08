@@ -1,5 +1,12 @@
 ## Setting up the database
 
+Conda setup:
+```
+python -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+```
+
 ```sh
 invoke init-db
 ```
