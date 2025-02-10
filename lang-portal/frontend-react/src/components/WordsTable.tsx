@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { ChevronUp, ChevronDown } from 'lucide-react'
 import { Word } from '../services/api'
 
-export type WordSortKey = 'kanji' | 'romaji' | 'english' | 'correct_count' | 'wrong_count'
+export type WordSortKey = 'english' | 'italian' | 'correct_count' | 'wrong_count'
 
 interface WordsTableProps {
   words: Word[]
