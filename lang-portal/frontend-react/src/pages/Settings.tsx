@@ -9,7 +9,7 @@ export default function Settings() {
   const handleReset = async () => {
     if (resetConfirmation.toLowerCase() === 'reset me') {
       try {
-        const response = await fetch('http://localhost:5000/api/study-sessions/reset', {
+        const response = await fetch('${import.meta.env.VITE_API_URL}/api/study-sessions/reset', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
