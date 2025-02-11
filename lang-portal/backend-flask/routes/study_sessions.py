@@ -9,21 +9,41 @@ def load(app):
   @cross_origin()
   def review_study_session(id):
       try:
-          # Get the current session
           cursor = app.db.cursor()
-          cursor.execute('SELECT * FROM study_sessions WHERE id = ?', (id,))
+          
+          # Check if session exists
+          cursor.execute('SELECT id FROM study_sessions WHERE id = ?', (id,))
           session = cursor.fetchone()
-
           if not session:
               return jsonify({"error": "Study session not found"}), 404
 
-          # Process the review request
-          # For example, you could update the session's correct or wrong counts
-          # based on the user's input
+          # Get review data from request
+          data = request.get_json()
+          if not data or 'reviews' not in data:
+              return jsonify({"error": "No review data provided"}), 400
+
+          reviews = data['reviews']
+          
+          # Insert each review
+          for review in reviews:
+              if 'word_id' not in review or 'is_correct' not in review:
+                  return jsonify({"error": "Invalid review format"}), 400
+                  
+              cursor.execute('''
+                  INSERT INTO word_review_items 
+                  (study_session_id, word_id, correct, created_at)
+                  VALUES (?, ?, ?, CURRENT_TIMESTAMP)
+              ''', (
+                  id,
+                  review['word_id'],
+                  1 if review['is_correct'] else 0
+              ))
 
           app.db.commit()
-          return jsonify({"message": "Review recorded successfully"}), 200
+          return jsonify({"message": "Reviews recorded successfully"}), 200
+          
       except Exception as e:
+          app.db.rollback()
           return jsonify({"error": str(e)}), 500
 
   @app.route('/api/study-sessions', methods=['GET'])
@@ -171,21 +191,46 @@ def load(app):
     except Exception as e:
       return jsonify({"error": str(e)}), 500
 
-  # todo POST /study_sessions/:id/review
   @app.route('/api/study-sessions', methods=['POST'])
   @cross_origin()
   def create_study_session():
       try:
-          # Process the request data and create a new study session
-          # For example, you could use the request JSON to populate the 
-          # session's attributes (e.g., group_id, activity_id, etc.)
+          # Get and validate request data
+          data = request.get_json()
+          if not data or 'group_id' not in data or 'study_activity_id' not in data:
+              return jsonify({"error": "Missing required fields"}), 400
 
           cursor = app.db.cursor()
-          cursor.execute('INSERT INTO study_sessions (...) VALUES (...)')
+          
+          # Verify group exists
+          cursor.execute('SELECT id FROM groups WHERE id = ?', (data['group_id'],))
+          if not cursor.fetchone():
+              return jsonify({"error": "Group not found"}), 404
+
+          # Verify study activity exists
+          cursor.execute('SELECT id FROM study_activities WHERE id = ?', (data['study_activity_id'],))
+          if not cursor.fetchone():
+              return jsonify({"error": "Study activity not found"}), 404
+
+          # Create the study session
+          cursor.execute('''
+              INSERT INTO study_sessions (group_id, study_activity_id, created_at)
+              VALUES (?, ?, CURRENT_TIMESTAMP)
+          ''', (
+              data['group_id'],
+              data['study_activity_id']
+          ))
+          
+          session_id = cursor.lastrowid
           app.db.commit()
 
-          return jsonify({"message": "Study session created successfully"}), 201
+          return jsonify({
+              "message": "Study session created successfully",
+              "session_id": session_id
+          }), 201
+
       except Exception as e:
+          app.db.rollback()
           return jsonify({"error": str(e)}), 500
 
   @app.route('/api/study-sessions/reset', methods=['POST'])

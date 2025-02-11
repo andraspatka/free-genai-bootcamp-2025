@@ -14,7 +14,7 @@ export default function StudyActivities() {
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    fetch('${import.meta.env.VITE_API_URL}/api/study-activities')
+    fetch(`${import.meta.env.VITE_API_URL}/study-activities`)
       .then(response => {
         if (!response.ok) {
           throw new Error('Failed to fetch study activities')
