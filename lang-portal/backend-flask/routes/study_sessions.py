@@ -5,6 +5,26 @@ import math
 
 def load(app):
   # todo /study_sessions POST
+  @app.route('/api/study-sessions/<id>/review', methods=['POST'])
+  @cross_origin()
+  def review_study_session(id):
+      try:
+          # Get the current session
+          cursor = app.db.cursor()
+          cursor.execute('SELECT * FROM study_sessions WHERE id = ?', (id,))
+          session = cursor.fetchone()
+
+          if not session:
+              return jsonify({"error": "Study session not found"}), 404
+
+          # Process the review request
+          # For example, you could update the session's correct or wrong counts
+          # based on the user's input
+
+          app.db.commit()
+          return jsonify({"message": "Review recorded successfully"}), 200
+      except Exception as e:
+          return jsonify({"error": str(e)}), 500
 
   @app.route('/api/study-sessions', methods=['GET'])
   @cross_origin()
@@ -152,6 +172,21 @@ def load(app):
       return jsonify({"error": str(e)}), 500
 
   # todo POST /study_sessions/:id/review
+  @app.route('/api/study-sessions', methods=['POST'])
+  @cross_origin()
+  def create_study_session():
+      try:
+          # Process the request data and create a new study session
+          # For example, you could use the request JSON to populate the 
+          # session's attributes (e.g., group_id, activity_id, etc.)
+
+          cursor = app.db.cursor()
+          cursor.execute('INSERT INTO study_sessions (...) VALUES (...)')
+          app.db.commit()
+
+          return jsonify({"message": "Study session created successfully"}), 201
+      except Exception as e:
+          return jsonify({"error": str(e)}), 500
 
   @app.route('/api/study-sessions/reset', methods=['POST'])
   @cross_origin()
