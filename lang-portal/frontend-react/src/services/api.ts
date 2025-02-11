@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://localhost:5000';
+const API_BASE_URL = 'http://localhost:8000';
 
 // Group types
 export interface Group {
@@ -142,6 +142,8 @@ export const fetchWords = async (
     `${API_BASE_URL}/words?page=${page}&sort_by=${sortBy}&order=${order}`
   );
   if (!response.ok) {
+    console.log(response);
+    console.log(response.status);
     throw new Error('Failed to fetch words');
   }
   return response.json();
