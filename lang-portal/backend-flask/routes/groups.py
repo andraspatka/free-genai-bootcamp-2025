@@ -95,13 +95,13 @@ def load(app):
       offset = (page - 1) * words_per_page
 
       # Get sorting parameters
-      sort_by = request.args.get('sort_by', 'kanji')
+      sort_by = request.args.get('sort_by', 'italian')
       order = request.args.get('order', 'asc')
 
       # Validate sort parameters
-      valid_columns = ['kanji', 'romaji', 'english', 'correct_count', 'wrong_count']
+      valid_columns = ['english', 'italian', 'correct_count', 'wrong_count']
       if sort_by not in valid_columns:
-        sort_by = 'kanji'
+        sort_by = 'italian'
       if order not in ['asc', 'desc']:
         order = 'asc'
 
@@ -140,9 +140,8 @@ def load(app):
       for word in words:
         words_data.append({
           "id": word["id"],
-          "kanji": word["kanji"],
-          "romaji": word["romaji"],
           "english": word["english"],
+          "italian": word["italian"],
           "correct_count": word["correct_count"],
           "wrong_count": word["wrong_count"]
         })
@@ -169,11 +168,11 @@ def load(app):
 
       # Query to fetch all words for the group without pagination
       cursor.execute('''
-        SELECT w.id, w.kanji, w.romaji, w.english
+        SELECT w.id, w.english, w.italian
         FROM words w
         JOIN word_groups wg ON w.id = wg.word_id
         WHERE wg.group_id = ?
-        ORDER BY w.kanji ASC
+        ORDER BY w.italian ASC
       ''', (id,))
       
       words = cursor.fetchall()
@@ -183,9 +182,8 @@ def load(app):
       for word in words:
         words_data.append({
           "id": word["id"],
-          "kanji": word["kanji"],
-          "romaji": word["romaji"],
-          "english": word["english"]
+          "english": word["english"],
+          "italian": word["italian"]
         })
 
       return jsonify({

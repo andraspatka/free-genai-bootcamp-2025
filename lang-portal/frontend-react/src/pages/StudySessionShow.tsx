@@ -31,7 +31,7 @@ export default function StudySessionShow() {
   const [words, setWords] = useState<Word[]>([])
   const [currentPage, setCurrentPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
-  const [sortKey, setSortKey] = useState<WordSortKey>('kanji')
+  const [sortKey, setSortKey] = useState<WordSortKey>('italian')
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)

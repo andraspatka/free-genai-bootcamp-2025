@@ -18,7 +18,7 @@ export default function WordsTable({ words, sortKey, sortDirection, onSort }: Wo
       <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
         <thead className="bg-gray-50 dark:bg-gray-900">
           <tr>
-            {(['kanji', 'romaji', 'english', 'correct_count', 'wrong_count'] as const).map((key) => (
+            {(['english', 'italian', 'correct_count', 'wrong_count'] as const).map((key) => (
               <th
                 key={key}
                 className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"
@@ -46,11 +46,11 @@ export default function WordsTable({ words, sortKey, sortDirection, onSort }: Wo
                   to={`/words/${word.id}`}
                   className="text-blue-600 dark:text-blue-400 hover:underline"
                 >
-                  {word.kanji}
+                  {word.italian}
                 </Link>
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
-                {word.romaji}
+                {word.italian}
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
                 {word.english}

@@ -21,9 +21,8 @@ export interface WordGroup {
 
 export interface Word {
   id: number;
-  kanji: string;
-  romaji: string;
   english: string;
+  italian: string;
   correct_count: number;
   wrong_count: number;
   groups: WordGroup[];
@@ -107,7 +106,7 @@ export interface GroupWordsResponse {
 export const fetchGroupDetails = async (
   groupId: number,
   page: number = 1,
-  sortBy: string = 'kanji',
+  sortBy: string = 'italian',
   order: 'asc' | 'desc' = 'asc'
 ): Promise<GroupDetails> => {
   const response = await fetch(`${API_BASE_URL}/groups/${groupId}`);
@@ -120,7 +119,7 @@ export const fetchGroupDetails = async (
 export const fetchGroupWords = async (
   groupId: number,
   page: number = 1,
-  sortBy: string = 'kanji',
+  sortBy: string = 'italian',
   order: 'asc' | 'desc' = 'asc'
 ): Promise<GroupWordsResponse> => {
   const response = await fetch(
@@ -135,7 +134,7 @@ export const fetchGroupWords = async (
 // Word API
 export const fetchWords = async (
   page: number = 1,
-  sortBy: string = 'kanji',
+  sortBy: string = 'italian',
   order: 'asc' | 'desc' = 'asc'
 ): Promise<WordsResponse> => {
   const response = await fetch(
@@ -163,7 +162,7 @@ export const createStudySession = async (
   groupId: number,
   studyActivityId: number
 ): Promise<{ session_id: number }> => {
-  const response = await fetch(`${API_BASE_URL}/study_sessions`, {
+  const response = await fetch(`${API_BASE_URL}/study-sessions`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -183,7 +182,7 @@ export const submitStudySessionReview = async (
   sessionId: number,
   reviews: WordReview[]
 ): Promise<void> => {
-  const response = await fetch(`${API_BASE_URL}/study_sessions/${sessionId}/review`, {
+  const response = await fetch(`${API_BASE_URL}/study-sessions/${sessionId}/review`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -208,7 +207,7 @@ export async function fetchStudySessions(
   perPage: number = 10
 ): Promise<StudySessionsResponse> {
   const response = await fetch(
-    `${API_BASE_URL}/api/study-sessions?page=${page}&per_page=${perPage}`
+    `${API_BASE_URL}/study-sessions?page=${page}&per_page=${perPage}`
   );
   if (!response.ok) {
     throw new Error('Failed to fetch study sessions');
@@ -229,7 +228,7 @@ export async function fetchGroupStudySessions(
   order: 'asc' | 'desc' = 'desc'
 ): Promise<StudySessionsResponse> {
   const response = await fetch(
-    `${API_BASE_URL}/groups/${groupId}/study_sessions?page=${page}&sort_by=${sortBy}&order=${order}`
+    `${API_BASE_URL}/groups/${groupId}/study-sessions?page=${page}&sort_by=${sortBy}&order=${order}`
   );
   if (!response.ok) {
     throw new Error('Failed to fetch group study sessions');

@@ -18,7 +18,7 @@ def load(app):
       offset = (page - 1) * words_per_page
 
       # Get sorting parameters from the query string
-      sort_by = request.args.get('sort_by', 'kanji')  # Default to sorting by 'kanji'
+      sort_by = request.args.get('sort_by', 'italian')  # Default to sorting by 'italian'
       order = request.args.get('order', 'asc')  # Default to ascending order
 
       # Validate sort_by and order
@@ -78,7 +78,7 @@ def load(app):
       
       # Query to fetch the word and its details
       cursor.execute('''
-        SELECT w.id, w.kanji, w.romaji, w.english,
+        SELECT w.id, w.english, w.italian,
                COALESCE(r.correct_count, 0) AS correct_count,
                COALESCE(r.wrong_count, 0) AS wrong_count,
                GROUP_CONCAT(DISTINCT g.id || '::' || g.name) as groups
@@ -108,9 +108,8 @@ def load(app):
       return jsonify({
         "word": {
           "id": word["id"],
-          "kanji": word["kanji"],
-          "romaji": word["romaji"],
           "english": word["english"],
+          "italian": word["italian"],
           "correct_count": word["correct_count"],
           "wrong_count": word["wrong_count"],
           "groups": groups
