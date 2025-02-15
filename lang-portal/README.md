@@ -2,6 +2,7 @@
 
 Start up the applications like so:
 
+```
 # Start both services
 make start
 

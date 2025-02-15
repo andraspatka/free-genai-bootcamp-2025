@@ -2,13 +2,14 @@
 
 # Default target
 start:
-ifeq ($(filter $(firstword $(MAKECMDGOALS)), backend frontend),)
-	docker-compose up --build
-else ifeq ($(firstword $(MAKECMDGOALS)), backend)
-	docker-compose up --build api
-else ifeq ($(firstword $(MAKECMDGOALS)), frontend)
-	docker-compose up --build frontend
-endif
+	@case "$(filter-out $@,$(MAKECMDGOALS))" in \
+		backend) \
+			docker-compose up --build api;; \
+		frontend) \
+			docker-compose up --build frontend;; \
+		*) \
+			docker-compose up --build;; \
+	esac
 
 # Stop all containers
 stop:
