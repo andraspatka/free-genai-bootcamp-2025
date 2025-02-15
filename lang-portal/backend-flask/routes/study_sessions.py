@@ -4,7 +4,50 @@ from datetime import datetime
 import math
 
 def load(app):
-  # todo /study_sessions POST
+  # IMPLEMENTED ENDPOINT
+  @app.route('/api/study-sessions', methods=['POST'])
+  @cross_origin()
+  def create_study_session():
+      try:
+          # Get and validate request data
+          data = request.get_json()
+          if not data or 'group_id' not in data or 'study_activity_id' not in data:
+              return jsonify({"error": "Missing required fields"}), 400
+
+          cursor = app.db.cursor()
+          
+          # Verify group exists
+          cursor.execute('SELECT id FROM groups WHERE id = ?', (data['group_id'],))
+          if not cursor.fetchone():
+              return jsonify({"error": "Group not found"}), 404
+
+          # Verify study activity exists
+          cursor.execute('SELECT id FROM study_activities WHERE id = ?', (data['study_activity_id'],))
+          if not cursor.fetchone():
+              return jsonify({"error": "Study activity not found"}), 404
+
+          # Create the study session
+          cursor.execute('''
+              INSERT INTO study_sessions (group_id, study_activity_id, created_at)
+              VALUES (?, ?, CURRENT_TIMESTAMP)
+          ''', (
+              data['group_id'],
+              data['study_activity_id']
+          ))
+          
+          session_id = cursor.lastrowid
+          app.db.commit()
+
+          return jsonify({
+              "message": "Study session created successfully",
+              "session_id": session_id
+          }), 201
+
+      except Exception as e:
+          app.db.rollback()
+          return jsonify({"error": str(e)}), 500
+
+  # IMPLEMENTED ENDPOINT
   @app.route('/api/study-sessions/<id>/review', methods=['POST'])
   @cross_origin()
   def review_study_session(id):
@@ -189,48 +232,6 @@ def load(app):
       })
     except Exception as e:
       return jsonify({"error": str(e)}), 500
-
-  @app.route('/api/study-sessions', methods=['POST'])
-  @cross_origin()
-  def create_study_session():
-      try:
-          # Get and validate request data
-          data = request.get_json()
-          if not data or 'group_id' not in data or 'study_activity_id' not in data:
-              return jsonify({"error": "Missing required fields"}), 400
-
-          cursor = app.db.cursor()
-          
-          # Verify group exists
-          cursor.execute('SELECT id FROM groups WHERE id = ?', (data['group_id'],))
-          if not cursor.fetchone():
-              return jsonify({"error": "Group not found"}), 404
-
-          # Verify study activity exists
-          cursor.execute('SELECT id FROM study_activities WHERE id = ?', (data['study_activity_id'],))
-          if not cursor.fetchone():
-              return jsonify({"error": "Study activity not found"}), 404
-
-          # Create the study session
-          cursor.execute('''
-              INSERT INTO study_sessions (group_id, study_activity_id, created_at)
-              VALUES (?, ?, CURRENT_TIMESTAMP)
-          ''', (
-              data['group_id'],
-              data['study_activity_id']
-          ))
-          
-          session_id = cursor.lastrowid
-          app.db.commit()
-
-          return jsonify({
-              "message": "Study session created successfully",
-              "session_id": session_id
-          }), 201
-
-      except Exception as e:
-          app.db.rollback()
-          return jsonify({"error": str(e)}), 500
 
   @app.route('/api/study-sessions/reset', methods=['POST'])
   @cross_origin()

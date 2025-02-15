@@ -1,10 +1,11 @@
 ## Setting up the database
 
-Conda setup:
+Venv setup:
 ```
 python -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
+pip install -r requirements-test.txt
 ```
 
 ```sh
@@ -28,4 +29,13 @@ Simply delete the `words.db` to clear entire database.
 python app.py 
 ```
 
-This should start the flask app on port `5000`
+This should start the flask app on port `8000`
+
+## Running the API tests
+
+```sh
+cd lang-portal.
+make start backend
+pip install -r requirements-test.txt
+pytest tests
+```
