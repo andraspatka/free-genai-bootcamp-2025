@@ -1,13 +1,12 @@
 import { useEffect, useState } from 'react'
 import StudySessionsTable, { type StudySessionSortKey } from '../components/StudySessionsTable'
-import Pagination from '../components/Pagination'
 import { type StudySession, fetchStudySessions } from '../services/api'
 
 export default function Sessions() {
   const [sessions, setSessions] = useState<StudySession[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [sortKey, setSortKey] = useState<StudySessionSortKey>('startTime')
+  const [sortKey, setSortKey] = useState<StudySessionSortKey>('start_time')
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc')
   const [currentPage, setCurrentPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)

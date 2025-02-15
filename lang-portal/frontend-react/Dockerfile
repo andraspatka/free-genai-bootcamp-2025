@@ -1,4 +1,4 @@
-FROM node:20-slim
+FROM node:22-slim
 
 WORKDIR /app
 
@@ -10,13 +10,15 @@ RUN npm install
 COPY . .
 
 # Build the application
-RUN npm run build
+RUN npm run build && \
+    node generate-serve-config.js && \
+    cp /app/serve.json /app/dist/serve.json
 
 # Install serve to run the built application
 RUN npm install -g serve
 
-# Expose port 3000
-EXPOSE 3000
+# Expose port 8080
+EXPOSE 8080
 
-# Run the application
-CMD ["serve", "-s", "dist", "-l", "3000"]
+# Run the application with the serve configuration
+CMD ["serve", "-s", "dist", "-l", "8080", "--config", "serve.json"]

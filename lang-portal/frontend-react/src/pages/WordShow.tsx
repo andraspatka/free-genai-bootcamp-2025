@@ -1,7 +1,7 @@
 import { useParams, Link } from 'react-router-dom'
 import { fetchWordDetails, type Word } from '../services/api'
 import { useNavigation } from '../context/NavigationContext'
-
+import { useState, useEffect } from 'react'
 export default function WordShow() {
   const { id } = useParams<{ id: string }>()
   const [word, setWord] = useState<Word | null>(null)

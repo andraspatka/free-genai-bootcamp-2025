@@ -41,11 +41,11 @@ export interface WordsResponse {
 
 // Update the StudySessionSortKey type to match the actual keys
 export type StudySessionSortKey = 
-  | 'startTime'  // Changed from 'start_time'
-  | 'endTime'    // Changed from 'end_time'
-  | 'activityName'  // Changed from 'activity_name'
-  | 'groupName'     // Changed from 'group_name'
-  | 'reviewItemsCount'  // Changed from 'review_items_count'
+  | 'start_time'
+  | 'end_time' 
+  | 'activity_name' 
+  | 'group_name' 
+  | 'review_items_count' 
   | 'id';
 
 // Study Session types
@@ -114,9 +114,6 @@ export interface GroupWordsResponse {
 
 export const fetchGroupDetails = async (
   groupId: number,
-  page: number = 1,
-  sortBy: string = 'italian',
-  order: 'asc' | 'desc' = 'asc'
 ): Promise<GroupDetails> => {
   const response = await fetch(`${API_BASE_URL}/groups/${groupId}`);
   if (!response.ok) {

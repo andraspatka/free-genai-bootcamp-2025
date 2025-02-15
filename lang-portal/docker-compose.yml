@@ -6,10 +6,9 @@ services:
       context: ./backend-flask
       dockerfile: Dockerfile
     ports:
-      - "8000:8000"
+      - "5000:5000"
     volumes:
-      - ./backend-flask:/app
-      - ./data:/app/data
+      - ./backend-flask/words.db:/app/words.db
     environment:
       - FLASK_ENV=development
     networks:
@@ -20,12 +19,9 @@ services:
       context: ./frontend-react
       dockerfile: Dockerfile
     ports:
-      - "3000:3000"
-    volumes:
-      - ./frontend-react:/app
-      - /app/node_modules
+      - "8080:8080"
     environment:
-      - VITE_API_URL=http://localhost:8000/api
+      - API_URL=http://localhost:8000
     depends_on:
       - api
     networks:

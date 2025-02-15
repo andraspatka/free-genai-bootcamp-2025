@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import WordsTable from '@/components/WordsTable'
+import WordsTable, { type WordSortKey } from '@/components/WordsTable'
 import Pagination from '@/components/Pagination'
-import type { Word, WordSortKey } from '@/services/api'
+import type { Word } from '@/services/api'  
 
 interface StudySession {
   id: number
