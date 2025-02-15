@@ -14,8 +14,8 @@ A language learning school wants to build a prototype of learning portal which w
 - The API will be built using Gin
 - Mage is a task runner for Go.
 - The API will always return JSON
-- There will no authentication or authorization
-- Everything be treated as a single user
+- There will be no authentication or authorization
+- Everything will be treated as a single user
 
 ## Directory Structure
 
@@ -44,7 +44,6 @@ We have the following tables:
   - id integer
   - italian string
   - english string
-  - parts json
 - words_groups - join table for words and groups many-to-many
   - id integer
   - word_id integer
@@ -70,7 +69,7 @@ We have the following tables:
 
 ## API Endpoints
 
-### GET /api/dashboard/last_study_session
+### GET /api/dashboard/last-study-session
 Returns information about the most recent study session.
 
 #### JSON Response
@@ -85,7 +84,7 @@ Returns information about the most recent study session.
 }
 ```
 
-### GET /api/dashboard/study_progress
+### GET /api/dashboard/study-progress
 Returns study progress statistics.
 Please note that the frontend will determine progress bar based on total words studied and total available words.
 
@@ -112,7 +111,9 @@ Returns quick overview statistics.
 }
 ```
 
-### GET /api/study_activities/:id
+### GET /api/study-activities/:id
+
+Returns a study activity with a given ID
 
 #### JSON Response
 ```json
@@ -124,7 +125,9 @@ Returns quick overview statistics.
 }
 ```
 
-### GET /api/study_activities/:id/study_sessions
+### GET /api/study-activities/:id/study-sessions
+
+Returns study sessions for a study activity with the given ID
 
 - pagination with 100 items per page
 
@@ -149,7 +152,9 @@ Returns quick overview statistics.
 }
 ```
 
-### POST /api/study_activities
+### POST /api/study-activities
+
+Creates a new study activity.
 
 #### Request Params
 - group_id integer
@@ -163,6 +168,7 @@ Returns quick overview statistics.
 
 ### GET /api/words
 
+Returns a list of words with pagination.
 - pagination with 100 items per page
 
 #### JSON Response
@@ -186,6 +192,9 @@ Returns quick overview statistics.
 ```
 
 ### GET /api/words/:id
+
+Returns the word entry with the given ID.
+
 #### JSON Response
 ```json
 {
@@ -205,6 +214,7 @@ Returns quick overview statistics.
 ```
 
 ### GET /api/groups
+Returns a list of groups with pagination.
 - pagination with 100 items per page
 #### JSON Response
 ```json
@@ -226,6 +236,7 @@ Returns quick overview statistics.
 ```
 
 ### GET /api/groups/:id
+Returns the group entry with the given ID.
 #### JSON Response
 ```json
 {
@@ -238,6 +249,9 @@ Returns quick overview statistics.
 ```
 
 ### GET /api/groups/:id/words
+
+Returns a list of words for the given group with pagination.
+
 #### JSON Response
 ```json
 {
@@ -258,7 +272,10 @@ Returns quick overview statistics.
 }
 ```
 
-### GET /api/groups/:id/study_sessions
+### GET /api/groups/:id/study-sessions
+
+Returns a study session for the group with the given ID.
+
 #### JSON Response
 ```json
 {
@@ -281,7 +298,10 @@ Returns quick overview statistics.
 }
 ```
 
-### GET /api/study_sessions
+### GET /api/study-sessions
+
+Returns the list of all study sessions
+
 - pagination with 100 items per page
 #### JSON Response
 ```json
@@ -305,7 +325,10 @@ Returns quick overview statistics.
 }
 ```
 
-### GET /api/study_sessions/:id
+### GET /api/study-sessions/:id
+
+Returns the study session with the specified ID.
+
 #### JSON Response
 ```json
 {
@@ -318,7 +341,10 @@ Returns quick overview statistics.
 }
 ```
 
-### GET /api/study_sessions/:id/words
+### GET /api/study-sessions/:id/words
+
+Returns the statistics about a word with the given from all study sessions.
+
 - pagination with 100 items per page
 #### JSON Response
 ```json
@@ -340,7 +366,10 @@ Returns quick overview statistics.
 }
 ```
 
-### POST /api/reset_history
+### POST /api/reset-history
+
+Resets the study history. This will remove all study sessions and word review items.
+
 #### JSON Response
 ```json
 {
@@ -349,7 +378,10 @@ Returns quick overview statistics.
 }
 ```
 
-### POST /api/full_reset
+### POST /api/full-reset
+
+Resets the entire system, removing all data.
+
 #### JSON Response
 ```json
 {
@@ -358,7 +390,10 @@ Returns quick overview statistics.
 }
 ```
 
-### POST /api/study_sessions/:id/words/:word_id/review
+### POST /api/study-sessions/:id/words/:word-id/review
+
+Sends a review for a word in a study session.
+
 #### Request Params
 - id (study_session_id) integer
 - word_id integer
@@ -384,7 +419,7 @@ Returns quick overview statistics.
 
 ## Task Runner Tasks
 
-Lets list out possible tasks we need for our lang portal.
+Let's list out possible tasks we need for our lang portal.
 
 ### Initialize Database
 This task will initialize the sqlite database called `words.db

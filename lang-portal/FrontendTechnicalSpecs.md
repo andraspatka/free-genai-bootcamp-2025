@@ -28,11 +28,11 @@ and act as the default page when a user visit the web-app
 
 #### Needed API Endpoints
 
-- GET /api/dashboard/last_study_session
-- GET /api/dashboard/study_progress
-- GET /api/dashboard/quick_stats
+- GET /api/dashboard/last-study-session
+- GET /api/dashboard/study-progress
+- GET /api/dashboard/quick-stats
 
-### Study Activities Index `/study_activities`
+### Study Activities Index `/study-activities`
 
 #### Purpose
 The purpose of this page is show to show a collection
@@ -48,9 +48,9 @@ of study activities with a thumbnail and its name, to either launch or view the 
 
 #### Needed API Endpoints
 
-- GET /api/study_activities
+- GET /api/study-activities
 
-### Study Activity Show `/study_activities/:id`
+### Study Activity Show `/study-activities/:id`
 
 #### Purpose
 The purpose of this page is to show the details of a study activity and its past study sessions.
@@ -69,10 +69,10 @@ The purpose of this page is to show the details of a study activity and its past
     - number of review items 
 
 #### Needed API Endpoints
-- GET /api/study_activities/:id
-- GET /api/study_activities/:id/study_sessions
+- GET /api/study-activities/:id
+- GET /api/study-activities/:id/study-sessions
 
-### Study Activities Launch `/study_activities/:id/launch`
+### Study Activities Launch `/study-activities/:id/launch`
 
 #### Purpose
 The purpose of this page is to launch a study activity.
@@ -89,7 +89,7 @@ After the form is submitted a new tab opens with the study activity based on its
 Also the after form is submitted the page will redirect to the study sesssion show page
 
 #### Needed API Endpoints
-- POST /api/study_activities
+- POST /api/study-activities
 
 ### Words Index `/words`
 
@@ -127,7 +127,7 @@ The purpose of this page is to show information about a specific word.
     - when group name is clicked it will take us to the group show page
 
 #### Needed API Endpoints
-- GET /API/words/:id
+- GET /api/words/:id
 
 ### Word Groups Index `/groups`
 
@@ -162,9 +162,9 @@ The purpose of this page is to show information about a specific group.
 #### Needed API Endpoints
 - GET /api/groups/:id (the name and groups stats)
 - GET /api/groups/:id/words
-- GET /api/groups/:id/study_sessions
+- GET /api/groups/:id/study-sessions
 
-## Study Sessions Index `/study_sessions`
+## Study Sessions Index `/study-sessions`
 
 #### Purpose
 The purpose of this page is to show a list of study sessions in our database.
@@ -181,9 +181,9 @@ The purpose of this page is to show a list of study sessions in our database.
     - Clicking the study session id will take us to the study session show page
 
 #### Needed API Endpoints
-- GET /api/study_sessions
+- GET /api/study-sessions
 
-### Study Session Show `/study_sessions/:id`
+### Study Session Show `/study-sessions/:id`
 
 #### Purpose
 The purpose of this page is to show information about a specific study session.
@@ -199,8 +199,8 @@ The purpose of this page is to show information about a specific study session.
     - Should use the same component as the words index page
 
 #### Needed API Endpoints
-- GET /api/study_sessions/:id
-- GET /api/study_sessions/:id/words
+- GET /api/study-sessions/:id
+- GET /api/study-sessions/:id/words
 
 ### Settings Page `/settings`
 
@@ -215,5 +215,5 @@ The purpose of this page is to make configurations to the study portal.
    - this will drop all tables and re-create with seed data
 
 #### Needed API Endpoints
-- POST /api/reset_history
-- POST /api/full_reset
+- POST /api/reset-history
+- POST /api/full-reset
