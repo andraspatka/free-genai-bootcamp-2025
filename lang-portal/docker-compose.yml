@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  api:
+    build:
+      context: ./backend-flask
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend-flask:/app
+      - ./data:/app/data
+    environment:
+      - FLASK_ENV=development
+    networks:
+      - lang-portal-network
+
+  frontend:
+    build:
+      context: ./frontend-react
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend-react:/app
+      - /app/node_modules
+    environment:
+      - VITE_API_URL=http://localhost:8000/api
+    depends_on:
+      - api
+    networks:
+      - lang-portal-network
+
+networks:
+  lang-portal-network:
+    driver: bridge
