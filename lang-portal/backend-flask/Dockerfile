@@ -15,5 +15,7 @@ RUN mkdir -p /app/data
 # Expose port 8000
 EXPOSE 8000
 
+RUN invoke init-db
+
 # Run the application
 CMD ["python", "app.py"]
