@@ -39,6 +39,15 @@ export interface WordsResponse {
   total_words: number;
 }
 
+// Update the StudySessionSortKey type to match the actual keys
+export type StudySessionSortKey = 
+  | 'startTime'  // Changed from 'start_time'
+  | 'endTime'    // Changed from 'end_time'
+  | 'activityName'  // Changed from 'activity_name'
+  | 'groupName'     // Changed from 'group_name'
+  | 'reviewItemsCount'  // Changed from 'review_items_count'
+  | 'id';
+
 // Study Session types
 export interface StudySession {
   id: number;

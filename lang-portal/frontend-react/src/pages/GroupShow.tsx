@@ -22,7 +22,7 @@ export default function GroupShow() {
   const [studySessions, setStudySessions] = useState<StudySession[]>([])
   const [wordSortKey, setWordSortKey] = useState<WordSortKey>('italian')
   const [wordSortDirection, setWordSortDirection] = useState<'asc' | 'desc'>('asc')
-  const [sessionSortKey, setSessionSortKey] = useState<StudySessionSortKey>('startTime')
+  const [sessionSortKey, setSessionSortKey] = useState<StudySessionSortKey>('start_time')
   const [sessionSortDirection, setSessionSortDirection] = useState<'asc' | 'desc'>('desc')
   const [wordsPage, setWordsPage] = useState(1)
   const [sessionsPage, setSessionsPage] = useState(1)

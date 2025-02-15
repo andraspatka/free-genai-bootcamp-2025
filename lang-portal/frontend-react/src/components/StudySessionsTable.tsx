@@ -2,7 +2,13 @@ import { Link } from 'react-router-dom'
 import { ChevronUp, ChevronDown } from 'lucide-react'
 import { StudySession } from '../services/api'
 
-export type StudySessionSortKey = 'id' | 'activity_name' | 'group_name' | 'start_time' | 'end_time' | 'review_items_count'
+export type StudySessionSortKey = 
+  | 'id'
+  | 'activity_name'
+  | 'group_name'
+  | 'start_time'
+  | 'end_time'
+  | 'review_items_count';
 
 interface StudySessionsTableProps {
   sessions: StudySession[]
@@ -11,12 +17,7 @@ interface StudySessionsTableProps {
   onSort: (key: StudySessionSortKey) => void
 }
 
-export default function StudySessionsTable({ 
-  sessions, 
-  sortKey, 
-  sortDirection, 
-  onSort 
-}: StudySessionsTableProps) {
+export default function StudySessionsTable({ sessions, sortKey, sortDirection, onSort }: StudySessionsTableProps) {
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-x-auto">
       <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
@@ -30,7 +31,11 @@ export default function StudySessionsTable({
                 onClick={() => onSort(key)}
               >
                 <div className="flex items-center">
-                  {key === 'review_items_count' ? '# Review Items' : key.replace(/_([a-z])/g, ' $1').trim()}
+                  {key === 'review_items_count' ? '# Review Items' : 
+                   key === 'activity_name' ? 'Activity' :
+                   key === 'group_name' ? 'Group' :
+                   key === 'start_time' ? 'Start Time' :
+                   key === 'end_time' ? 'End Time' : 'ID'}
                   {sortKey === key && (
                     sortDirection === 'asc' ? <ChevronUp className="ml-1 h-4 w-4" /> : <ChevronDown className="ml-1 h-4 w-4" />
                   )}
