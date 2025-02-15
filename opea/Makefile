@@ -1,4 +1,4 @@
-.PHONY: start stop test
+.PHONY: start stop test pull
 
 # Default target
 start:
@@ -16,9 +16,14 @@ stop:
 # Doesn't work yet -> {"error":"model 'llama3.2:1b' not found"}%
 test:
 	curl --noproxy "*" http://localhost:8008/api/generate -d '{\
-		"model": "llama3.2",\
+		"model": "llama3.2:1b",\
 		"prompt":"Why is the sky blue?"\
 		}'
+
+pull:
+	curl http://localhost:8008/api/pull -d '{\
+  		"model": "$(filter-out $@,$(MAKECMDGOALS))"\
+	}'
 
 # Ignore arguments passed to targets
 %:

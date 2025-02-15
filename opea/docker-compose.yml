@@ -5,7 +5,7 @@ services:
     ports:
       - ${LLM_ENDPOINT_PORT:-8008}:11434
     environment:
-      LLM_MODEL_ID: "llama3.2:1b"
+      LLM_MODEL_ID: "llama3.2:1b" # Doesnt' do anything??
       host_ip: ${host_ip}
 
 networks:
