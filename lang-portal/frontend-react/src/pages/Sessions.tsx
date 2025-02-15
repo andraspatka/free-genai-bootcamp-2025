@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import StudySessionsTable, { type StudySessionSortKey } from '../components/StudySessionsTable'
 import Pagination from '../components/Pagination'
 import { type StudySession, fetchStudySessions } from '../services/api'
