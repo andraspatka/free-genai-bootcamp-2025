@@ -35,6 +35,8 @@ backend_go/
 └── words.db
 ```
 
+Important: Each entity should have a separate file for models, handlers and service. There should be 1 file each for Words, Groups, StudyActivities, StudySessions, WordReviewItems.
+
 ## Database Schema
 
 Our database will be a single sqlite database called `words.db` that will be in the root of the project folder of `backend_go`
