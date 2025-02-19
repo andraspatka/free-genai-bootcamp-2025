@@ -8,6 +8,7 @@ start:
 		*) \
 			docker-compose up -d --build;; \
 	esac
+	docker exec -it ollama-server ollama pull llama3.2:1b
 
 # Stop all containers
 stop:
@@ -16,6 +17,7 @@ stop:
 # Doesn't work yet -> {"error":"model 'llama3.2:1b' not found"}%
 test:
 	curl --noproxy "*" http://localhost:8008/api/generate -d '{\
+		"stream": false,\
 		"model": "llama3.2:1b",\
 		"prompt":"Why is the sky blue?"\
 		}'

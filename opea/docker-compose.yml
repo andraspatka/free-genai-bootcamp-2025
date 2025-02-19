@@ -7,6 +7,8 @@ services:
     environment:
       LLM_MODEL_ID: "llama3.2:1b" # Doesnt' do anything??
       host_ip: ${host_ip}
+  
+    command: --model-id ${LLM_MODEL_ID} --cuda-graphs 0
 
 networks:
   default:
