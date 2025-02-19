@@ -24,9 +24,9 @@ test:
 		}'
 
 test-text2sql:
-	curl --location http://${your_ip}:9090/v1/postgres/health \
+	curl --location http://localhost:9090/v1/postgres/health \
 	--header 'Content-Type: application/json' \
-	--data '{"user": "'${POSTGRES_USER}'","password": "'${POSTGRES_PASSWORD}'","host": "'${your_ip}'", "port": "5442", "database": "'${POSTGRES_DB}'"}'
+	--data '{"user": "'postgres'","password": "'postgres'","host": "'localhost'", "port": "5442", "database": "'postgres'"}'
 
 pull:
 	curl http://localhost:8008/api/pull -d '{\

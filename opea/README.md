@@ -21,3 +21,7 @@ I tried out `text2sql` and using the ollama-server endpoint as the `TGI_LLM_ENDP
 ```
 RuntimeError: This version of jaxlib was built using AVX instructions, which your CPU and/or operating system do not support. You may be able work around this issue by building jaxlib from source.
 ```
+
+-> Compiling the docker image myself makes it work. The dockerfile needs some updates so that it works. I forked the opea repo and made some changes to it and then added it here as a submodule.
+
+The text2sql service is starting up correctly now!
