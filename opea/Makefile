@@ -1,4 +1,4 @@
-.PHONY: start stop test pull
+.PHONY: start stop test pull test-text2sql
 
 # Default target
 start:
@@ -21,6 +21,11 @@ test:
 		"model": "llama3.2:1b",\
 		"prompt":"Why is the sky blue?"\
 		}'
+
+test-text2sql:
+	curl --location http://${your_ip}:9090/v1/postgres/health \
+	--header 'Content-Type: application/json' \
+	--data '{"user": "'${POSTGRES_USER}'","password": "'${POSTGRES_PASSWORD}'","host": "'${your_ip}'", "port": "5442", "database": "'${POSTGRES_DB}'"}'
 
 pull:
 	curl http://localhost:8008/api/pull -d '{\

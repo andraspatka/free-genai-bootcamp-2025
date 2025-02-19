@@ -8,7 +8,32 @@ services:
       LLM_MODEL_ID: "llama3.2:1b" # Doesnt' do anything??
       host_ip: ${host_ip}
   
-    command: --model-id ${LLM_MODEL_ID} --cuda-graphs 0
+    # command: --model-id ${LLM_MODEL_ID} --cuda-graphs 0
+
+  postgres: 
+    image: postgres:latest
+    container_name: postgres-container
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres
+    ports:
+      - '5442:5432'
+    volumes:
+      - ./chinook.sql:/docker-entrypoint-initdb.d/chinook.sql
+
+  text2sql:
+    image: opea/text2sql:${TAG:-latest}
+    container_name: text2sql-server
+    ports:
+      - ${TEXT2SQL_PORT:-9090}:8080
+    environment:
+      - TGI_LLM_ENDPOINT=ollama-server:8008
+    depends_on:
+      - ollama-server
+      - postgres
+
 
 networks:
   default:
