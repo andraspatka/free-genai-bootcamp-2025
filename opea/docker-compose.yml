@@ -24,7 +24,9 @@ services:
       - ./chinook.sql:/docker-entrypoint-initdb.d/chinook.sql
 
   text2sql:
-    image: opea/text2sql:${TAG:-latest}
+    build:
+      context: ./comps
+      dockerfile: ./comps/text2sql/src/Dockerfile
     container_name: text2sql-server
     ports:
       - ${TEXT2SQL_PORT:-9090}:8080

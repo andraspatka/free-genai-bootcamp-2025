@@ -1,0 +1,3 @@
+[submodule "opea/comps"]
+	path = opea/comps
+	url = https://github.com/andraspatka/GenAIComps.git

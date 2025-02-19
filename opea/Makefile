@@ -2,6 +2,7 @@
 
 # Default target
 start:
+	cd .. && git submodule init && git submodule update && cd -
 	@case "$(filter-out $@,$(MAKECMDGOALS))" in \
 		ollama) \
 			docker-compose up -d --build ollama;; \
