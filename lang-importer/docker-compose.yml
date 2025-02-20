@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  lang-importer:
+    build: .
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./exports:/app/exports
+    depends_on:
+      - ollama-server
+    environment:
+      - OLLAMA_SERVER_ENDPOINT=http://ollama-server:11434/api/generate
+      - OLLAMA_MODEL=llama3.2:1b
+
+  ollama-server:
+    image: ollama/ollama
+    container_name: ollama-server
+    ports:
+      - 8008:11434
+
+volumes:
+  ollama-data:
