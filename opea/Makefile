@@ -24,9 +24,13 @@ test:
 		}'
 
 test-text2sql:
-	curl --location http://localhost:9090/v1/postgres/health \
-	--header 'Content-Type: application/json' \
-	--data '{"user": "'postgres'","password": "'postgres'","host": "'localhost'", "port": "5442", "database": "'postgres'"}'
+	# curl --location http://localhost:9090/v1/postgres/health \
+	# --header 'Content-Type: application/json' \
+	# --data '{"user": "'postgres'","password": "'postgres'","host": "'localhost'", "port": "5442", "database": "'postgres'"}'
+	curl http://localhost:9090/v1/text2sql\
+		-X POST \
+		-d '{"input_text": "Find the total number of Albums.","conn_str": {"user": "'postgres'","password": "'postgres'","host": "'postgres'", "port": "5432", "database": "'postgres'"}}' \
+		-H 'Content-Type: application/json'
 
 pull:
 	curl http://localhost:8008/api/pull -d '{\
