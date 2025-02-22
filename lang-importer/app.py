@@ -3,6 +3,12 @@ import os
 from utils.llm_connector import OllamaLLMConnector
 from utils.vocab_generator import VocabGenerator
 
+def display_words():
+    # Display Generated Vocabulary
+    if 'vocab_list' in st.session_state:
+        st.subheader(f"Generated {st.session_state.word_group}")
+        st.table(st.session_state.vocab_list)
+
 def main():
     st.title("Language Vocabulary Generator")
     
@@ -22,8 +28,10 @@ def main():
     num_words = st.sidebar.slider("Number of Words", 5, 20, 10)
     language = st.sidebar.selectbox(
         "Target Language", 
-        ["Italian", "Spanish", "French"]
+        ["Italian"]
     )
+
+    display_words()
     
     # Generate Vocabulary Button
     if st.sidebar.button("Generate Vocabulary"):
@@ -33,20 +41,19 @@ def main():
                 language, 
                 num_words
             )
+            st.session_state.vocab_list = vocab_list
+            st.session_state.word_group = word_group
         
-        # Display Generated Vocabulary
-        st.subheader(f"Generated {word_group}")
-        st.table(vocab_list)
+        display_words()
         
+    if 'vocab_list' in st.session_state:
         # Export Options
-        export_filename = f"{word_group.lower()}_{language.lower()}.json"
+        export_filename = f"{st.session_state.word_group.lower()}_{language.lower()}.json"
         export_path = os.path.join("exports", export_filename)
-        
-        # Create exports directory if it doesn't exist
-        os.makedirs("exports", exist_ok=True)
-        
         if st.button(f"Export to {export_filename}"):
-            vocab_generator.export_to_json(vocab_list, export_path)
+            print(f"Exporting to {export_path}")
+            print(f"Vocabulary list: {st.session_state.vocab_list}")
+            vocab_generator.export_to_json(st.session_state.vocab_list, export_path)
             st.success(f"Vocabulary exported to {export_path}")
 
 if __name__ == "__main__":
