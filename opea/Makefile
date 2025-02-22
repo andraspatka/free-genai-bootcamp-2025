@@ -15,7 +15,6 @@ start:
 stop:
 	docker-compose down
 
-# Doesn't work yet -> {"error":"model 'llama3.2:1b' not found"}%
 test:
 	curl --noproxy "*" http://localhost:8008/api/generate -d '{\
 		"stream": false,\

@@ -4,10 +4,9 @@ Source: https://github.com/opea-project/GenAIComps
 
 ## Setup
 
-```
-make start
-make pull llama3.2:1b
-make test
+``` 
+make start # launch the services in docker-compose; this also pulls the image
+make test # execute an example query
 ```
 
 ## OPEA comps that were tried out
@@ -155,3 +154,5 @@ Next issue is that the ollama-server is not compatible with the TGI interface as
 
 It's complaining about the Huggingface API not being set (401), but the issue actually seems to be that it's expecting a TGI server and it's getting an Ollama one instead.
 It should be theoretically possible to rewrite the microservice to be compatible with Ollama API and to not use langchain, but that's too much work for not much gain.
+
+TGI not supported on M1: https://github.com/huggingface/text-generation-inference/issues/690
