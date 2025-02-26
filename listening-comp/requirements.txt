@@ -1,0 +1,4 @@
+boto3>=1.37.1
+youtube-transcript-api>=0.6.3
+chromadb>=0.6.3
+streamlit>=1.42.2

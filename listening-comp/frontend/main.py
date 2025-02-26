@@ -1,3 +1,12 @@
+import sys
+import os
+
+# Debug import paths
+print("Python Path:", sys.path)
+print("Current Working Directory:", os.getcwd())
+print("Backend Path:", os.path.exists('/app/backend'))
+print("Frontend Path:", os.path.exists('/app/frontend'))
+
 import streamlit as st
 from typing import Dict
 import json

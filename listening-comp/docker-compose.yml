@@ -1,0 +1,10 @@
+services:
+  italian-learning-assistant:
+    container_name: italian-learning-assistant
+    build: .
+    ports:
+      - "8501:8501"
+    environment:
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_REGION=${AWS_REGION}

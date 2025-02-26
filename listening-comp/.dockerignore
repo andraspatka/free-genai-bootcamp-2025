@@ -1,0 +1,64 @@
+# Git
+.git
+.gitignore
+
+# Environment files
+.env
+.env.template
+
+# Python cache and virtual environments
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+env/
+venv/
+.venv/
+.env/
+
+# IDE and editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Logs and databases
+*.log
+*.sqlite3
+
+# Docker and container-related
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Build and distribution
+build/
+dist/
+*.egg-info/
+
+# Testing and CI
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Miscellaneous
+README.md
+Makefile
+*.md
+# Explicitly exclude *.txt but include requirements.txt
+*.txt
+!requirements.txt
+
+# Specific to this project
+.streamlit/
+.cache/
