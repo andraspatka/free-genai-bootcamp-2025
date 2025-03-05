@@ -1,12 +1,3 @@
-import sys
-import os
-
-# Debug import paths
-print("Python Path:", sys.path)
-print("Current Working Directory:", os.getcwd())
-print("Backend Path:", os.path.exists('/app/backend'))
-print("Frontend Path:", os.path.exists('/app/frontend'))
-
 import streamlit as st
 from typing import Dict
 import json
@@ -15,6 +6,7 @@ import re
 
 
 from backend.chat import BedrockChat
+from backend.get_transcript import YouTubeTranscriptDownloader
 
 
 # Page config
@@ -153,6 +145,7 @@ def render_chat_stage():
     if st.session_state.messages:
         if st.button("Clear Chat", type="primary"):
             st.session_state.messages = []
+            st.session_state.bedrock_chat.clear_messages()
             st.rerun()
 
 def process_message(message: str):
