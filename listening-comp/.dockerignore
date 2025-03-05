@@ -62,3 +62,4 @@ Makefile
 # Specific to this project
 .streamlit/
 .cache/
+transcripts/

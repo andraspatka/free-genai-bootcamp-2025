@@ -3,6 +3,7 @@ from typing import Dict
 import json
 from collections import Counter
 import re
+from datetime import datetime
 
 
 from backend.chat import BedrockChat
@@ -195,6 +196,7 @@ def render_transcript_stage():
             try:
                 downloader = YouTubeTranscriptDownloader()
                 transcript = downloader.get_transcript(url)
+                downloader.save_transcript(transcript, datetime.now())
                 if transcript:
                     # Store the raw transcript text in session state
                     transcript_text = "\n".join([entry['text'] for entry in transcript])
