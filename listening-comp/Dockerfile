@@ -4,19 +4,11 @@ FROM python:3.11-slim
 # Set the working directory in the container
 WORKDIR /app
 
-# Install system dependencies
-# RUN apt-get update && apt-get install -y \
-#     build-essential \
-#     curl \
-#     software-properties-common \
-#     git \
-#     && rm -rf /var/lib/apt/lists/*
-
 # Copy the requirements file first to leverage Docker cache
 COPY requirements.txt .
 
 # Install Python dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt && pip install watchfiles
 
 # Copy the entire project
 COPY backend backend
@@ -34,4 +26,4 @@ ENV AWS_SECRET_ACCESS_KEY=""
 ENV AWS_REGION=""
 
 # Run the Streamlit application
-CMD ["streamlit", "run", "frontend/main.py", "--server.port=8501", "--server.address=0.0.0.0"]
+CMD ["watchfiles", "streamlit run frontend/main.py --server.port=8501 --server.address=0.0.0.0", "/app"]
