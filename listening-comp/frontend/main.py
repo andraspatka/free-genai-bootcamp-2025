@@ -5,6 +5,8 @@ from collections import Counter
 import re
 from datetime import datetime
 
+import os
+
 
 from backend.chat import BedrockChat
 from backend.get_transcript import YouTubeTranscriptDownloader
@@ -19,7 +21,7 @@ st.set_page_config(
 
 # Initialize session state
 if 'transcript' not in st.session_state:
-    st.session_state.transcript = None
+    st.session_state.transcript = ""
 if 'messages' not in st.session_state:
     st.session_state.messages = []
 
@@ -189,22 +191,23 @@ def render_transcript_stage():
         "YouTube URL",
         placeholder="Enter a Japanese lesson YouTube URL"
     )
-    
+
+    if 'youtube_transcript_downloader' not in st.session_state:
+        st.session_state.youtube_transcript_downloader = YouTubeTranscriptDownloader()
+
+    # st.write(st.session_state.transcript)
     # Download button and processing
     if url:
+        os.write(1, b'URL true')
         if st.button("Download Transcript"):
             try:
-                downloader = YouTubeTranscriptDownloader()
-                transcript = downloader.get_transcript(url)
-                downloader.save_transcript(transcript, datetime.now())
-                st.session_state
+                transcript = st.session_state.youtube_transcript_downloader.get_transcript(url)
+                st.session_state.youtube_transcript_downloader.save_transcript(transcript, datetime.now())
                 if transcript:
-                    st.session_state
                     # Store the raw transcript text in session state
                     transcript_text = "\n".join([entry['text'] for entry in transcript])
                     st.session_state.transcript = transcript_text
                     st.success("Transcript downloaded successfully!")
-                    st.session_state
                 else:
                     st.error("No transcript found for this video.")
             except Exception as e:
@@ -214,7 +217,7 @@ def render_transcript_stage():
     
     with col1:
         st.subheader("Raw Transcript")
-        if 'transcript' in st.session_state:
+        if st.session_state.transcript:
             st.text_area(
                 label="Raw text",
                 value=st.session_state.transcript,
@@ -227,7 +230,7 @@ def render_transcript_stage():
     
     with col2:
         st.subheader("Transcript Stats")
-        if 'transcript' in st.session_state:
+        if st.session_state.transcript:
             # Calculate stats
             jp_chars, total_chars = count_characters(st.session_state.transcript)
             total_lines = len(st.session_state.transcript.split('\n'))
@@ -239,6 +242,7 @@ def render_transcript_stage():
         else:
             st.info("Load a transcript to see statistics")
 
+
 def render_structured_stage():
     """Render the structured data stage"""
     st.header("Structured Data Processing")
@@ -249,7 +253,7 @@ def render_structured_stage():
         st.subheader("Dialogue Extraction")
         # Placeholder for dialogue processing
         # st.write(st.session_state.transcript)
-        if 'transcript' in st.session_state:
+        if st.session_state.transcript:
             st.text_area(
                 label="transcript",
                 value=st.session_state.transcript,
@@ -336,7 +340,7 @@ def main():
     with st.expander("Debug Information"):
         st.json({
             "selected_stage": selected_stage,
-            "transcript_loaded": 'transcript' in st.session_state,
+            "transcript_loaded": st.session_state.transcript != "",
             "chat_messages": len(st.session_state.messages)
         })
 

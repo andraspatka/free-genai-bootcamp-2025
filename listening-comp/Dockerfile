@@ -26,4 +26,7 @@ ENV AWS_SECRET_ACCESS_KEY=""
 ENV AWS_REGION=""
 
 # Run the Streamlit application
-CMD ["watchfiles", "streamlit run frontend/main.py --server.port=8501 --server.address=0.0.0.0", "/app"]
+# Make sure to not watch the entire /app directory as it contains the transcripts folder
+# The transcripts folder gets changed after transcript download which causes the server to restart and lose the
+# session state
+CMD ["watchfiles", "streamlit run frontend/main.py --server.port=8501 --server.address=0.0.0.0", "/app/backend", "/app/frontend"]
