@@ -197,11 +197,14 @@ def render_transcript_stage():
                 downloader = YouTubeTranscriptDownloader()
                 transcript = downloader.get_transcript(url)
                 downloader.save_transcript(transcript, datetime.now())
+                st.session_state
                 if transcript:
+                    st.session_state
                     # Store the raw transcript text in session state
                     transcript_text = "\n".join([entry['text'] for entry in transcript])
                     st.session_state.transcript = transcript_text
                     st.success("Transcript downloaded successfully!")
+                    st.session_state
                 else:
                     st.error("No transcript found for this video.")
             except Exception as e:
@@ -211,7 +214,7 @@ def render_transcript_stage():
     
     with col1:
         st.subheader("Raw Transcript")
-        if st.session_state.transcript:
+        if 'transcript' in st.session_state:
             st.text_area(
                 label="Raw text",
                 value=st.session_state.transcript,
@@ -224,7 +227,7 @@ def render_transcript_stage():
     
     with col2:
         st.subheader("Transcript Stats")
-        if st.session_state.transcript:
+        if 'transcript' in st.session_state:
             # Calculate stats
             jp_chars, total_chars = count_characters(st.session_state.transcript)
             total_lines = len(st.session_state.transcript.split('\n'))
@@ -245,7 +248,16 @@ def render_structured_stage():
     with col1:
         st.subheader("Dialogue Extraction")
         # Placeholder for dialogue processing
-        st.info("Dialogue extraction will be implemented here")
+        # st.write(st.session_state.transcript)
+        if 'transcript' in st.session_state:
+            st.text_area(
+                label="transcript",
+                value=st.session_state.transcript,
+                height=400,
+                disabled=True
+            )
+        else:
+            st.info("Load a transcript to start")
         
     with col2:
         st.subheader("Data Structure")
@@ -324,7 +336,7 @@ def main():
     with st.expander("Debug Information"):
         st.json({
             "selected_stage": selected_stage,
-            "transcript_loaded": st.session_state.transcript is not None,
+            "transcript_loaded": 'transcript' in st.session_state,
             "chat_messages": len(st.session_state.messages)
         })
 
