@@ -22,8 +22,8 @@ class TranscriptStructurer:
             - Third listening excercis
             - Conclusion
 
-            Please take the transcript and restructure it in the specified way.
-            The transcript is: {transcripts}
+            Please take the transcript and restructure it in the specified way. Print out the English translation alongside the italian parts
+            The transcript is: {transcript}
         '''
 
         return self.chat_client.generate_response(prompt)

@@ -10,6 +10,7 @@ import os
 
 from backend.chat import BedrockChat
 from backend.get_transcript import YouTubeTranscriptDownloader
+from backend.structured_data import TranscriptStructurer
 
 
 # Page config
@@ -24,6 +25,8 @@ if 'transcript' not in st.session_state:
     st.session_state.transcript = ""
 if 'messages' not in st.session_state:
     st.session_state.messages = []
+if 'transcript_structure' not in st.session_state:
+    st.session_state.transcript_structure = ""
 
 def render_header():
     """Render the header section"""
@@ -248,6 +251,10 @@ def render_structured_stage():
     st.header("Structured Data Processing")
     
     col1, col2 = st.columns(2)
+
+    if 'transcript_structurer' not in st.session_state:
+        st.session_state.transcript_structurer = TranscriptStructurer()
+    
     
     with col1:
         st.subheader("Dialogue Extraction")
@@ -260,13 +267,24 @@ def render_structured_stage():
                 height=400,
                 disabled=True
             )
+            if st.button("Structure transcript"):
+                transcript_structure = st.session_state.transcript_structurer.structure_transcript(st.session_state.transcript)
+                st.session_state.transcript_structure = transcript_structure
         else:
             st.info("Load a transcript to start")
         
     with col2:
         st.subheader("Data Structure")
         # Placeholder for structured data view
-        st.info("Structured data view will be implemented here")
+        if st.session_state.transcript_structure:
+            st.text_area(
+                label="structured data",
+                value=st.session_state.transcript_structure,
+                height=400,
+                disabled=True
+            )
+        else:
+            st.info("Load a transcript to see the structured data")
 
 def render_rag_stage():
     """Render the RAG implementation stage"""
