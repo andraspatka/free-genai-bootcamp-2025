@@ -1,6 +1,8 @@
 from youtube_transcript_api import YouTubeTranscriptApi
 from typing import Optional, List, Dict
 
+import os
+
 
 class YouTubeTranscriptDownloader:
     def __init__(self, languages: List[str] = ["it", "en"]):
@@ -59,7 +61,8 @@ class YouTubeTranscriptDownloader:
         Returns:
             bool: True if successful, False otherwise
         """
-        filename = f"./transcripts/{filename}.txt"
+        os.makedirs("data/structured", exist_ok=True)
+        filename = f"./data/transcripts/{filename}.txt"
         
         try:
             with open(filename, 'w', encoding='utf-8') as f:

@@ -1,6 +1,8 @@
-import boto3
 import streamlit as st
 from typing import Optional, Dict, Any
+
+import json
+import os
 
 from backend.chat import BedrockChat
 
@@ -12,20 +14,28 @@ class TranscriptStructurer:
 
     def structure_transcript(self, transcript: str) -> Optional[str]:
         """Generate a response using Amazon Bedrock"""
-        prompt = f'''
+        prompt = '''
             I have the following transcript from a youtube video which is of an Italian listening comprehension test
             level A1.
-            It is structured in the following way:
-            - Introduction
-            - First listening excercise
-            - Second listening excercise
-            - Third listening excercis
-            - Conclusion
+            Please take this transcript extract the parts which are strictly for the listening exercise only.
+            If the transcript is not exactly correct Italian, then fix it so the sentences all make sense and are correct
+            both in terms of grammar and meaning.
+            Please output the result in the following JSON format:
+            {
+                "transcript": "the transcript",
+                "english_translation": "the english translation"
+            }
+            Don't output anything else other than the JSON. The output of this prompt will be used by a script later one.
+            If the text contains anything else other than the JSON output, then the script will fail!
+        
+            The transcript is: ''' + transcript
 
-            Please take the transcript and restructure it in the specified way. Print out the English translation alongside the italian parts
-            The transcript is: {transcript}
-        '''
+        structured_data = self.chat_client.generate_response(prompt)
 
-        return self.chat_client.generate_response(prompt)
+        return structured_data
 
+    def save_to_file(self, structured_data: str, video_id: str) -> None:
+        os.makedirs("data/structured", exist_ok=True)
+        with open(f"data/structured/{video_id}.json", "w", encoding='utf-8') as f:
+            json.dump(structured_data, f, ensure_ascii=False, indent=4)
 

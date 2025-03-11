@@ -11,4 +11,4 @@ services:
     volumes:
       - ./backend:/app/backend
       - ./frontend:/app/frontend
-      - ./transcripts:/app/transcripts
+      - ./data:/app/data

@@ -197,6 +197,8 @@ def render_transcript_stage():
 
     if 'youtube_transcript_downloader' not in st.session_state:
         st.session_state.youtube_transcript_downloader = YouTubeTranscriptDownloader()
+    if 'video_id' not in st.session_state:
+        st.session_state.video_id = ""
 
     # st.write(st.session_state.transcript)
     # Download button and processing
@@ -205,7 +207,8 @@ def render_transcript_stage():
         if st.button("Download Transcript"):
             try:
                 transcript = st.session_state.youtube_transcript_downloader.get_transcript(url)
-                st.session_state.youtube_transcript_downloader.save_transcript(transcript, datetime.now())
+                st.session_state.video_id = st.session_state.youtube_transcript_downloader.extract_video_id(url)
+                st.session_state.youtube_transcript_downloader.save_transcript(transcript, st.session_state.video_id)
                 if transcript:
                     # Store the raw transcript text in session state
                     transcript_text = "\n".join([entry['text'] for entry in transcript])
@@ -270,6 +273,10 @@ def render_structured_stage():
             if st.button("Structure transcript"):
                 transcript_structure = st.session_state.transcript_structurer.structure_transcript(st.session_state.transcript)
                 st.session_state.transcript_structure = transcript_structure
+                st.session_state.transcript_structurer.save_to_file(transcript_structure, st.session_state.video_id)
+
+                if st.button("Add to Vector DB"):
+                    st.session_state.vector_db.add_document(transcript_structure)
         else:
             st.info("Load a transcript to start")
         
