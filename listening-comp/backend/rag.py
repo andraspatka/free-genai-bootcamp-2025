@@ -7,7 +7,7 @@ from typing import Dict, List, Optional
 
 
 class BedrockEmbeddingFunction(embedding_functions.EmbeddingFunction):
-    def __init__(self, model_id="amazon.titan-embed-text-v1"):
+    def __init__(self, model_id="amazon.titan-embed-text-v2:0"):
         """Initialize Bedrock embedding function"""
         self.bedrock_client = boto3.client('bedrock-runtime', region_name="us-east-1")
         self.model_id = model_id
@@ -30,7 +30,7 @@ class BedrockEmbeddingFunction(embedding_functions.EmbeddingFunction):
             except Exception as e:
                 print(f"Error generating embedding: {str(e)}")
                 # Return a zero vector as fallback
-                embeddings.append([0.0] * 1536)  # Titan model uses 1536 dimensions
+                embeddings.append([0.0] * 1024)  # Titan model uses 1024 dimensions
         return embeddings
 
 
@@ -58,6 +58,7 @@ class QuestionVectorStore:
 
     def add_exercise(self, exercise: Dict, video_id: str):
         """Add exercise to the vector store"""
+        exercise = json.loads(exercise)
             
         collection = self.collections["exercises"]
         
@@ -74,7 +75,7 @@ class QuestionVectorStore:
         "video_id": video_id,
         "full_structure": json.dumps(exercise)
         })
-            
+
         document = f"""
         Exercise: {exercise['transcript']}
         EnglishTranslation: {exercise['english_translation']}
@@ -143,5 +144,5 @@ if __name__ == "__main__":
             store.index_questions_file(filename)
     
     # Search for similar questions
-    similar = store.search_similar_questions("La Roma è città bellissima con storia antica.", n_results=1)
+    similar = store.search_similar_exercises("Good food", n_results=1)
     print(similar)
