@@ -34,9 +34,9 @@ class BedrockEmbeddingFunction(embedding_functions.EmbeddingFunction):
         return embeddings
 
 
-class QuestionVectorStore:
+class ExerciseVectorStore:
     def __init__(self, persist_directory: str = "data/vectorstore"):
-        """Initialize the vector store for JLPT listening questions"""
+        """Initialize the vector store for JLPT listening exercises"""
         self.persist_directory = persist_directory
         
         # Initialize ChromaDB client
@@ -55,6 +55,16 @@ class QuestionVectorStore:
             )
         }
 
+    
+    def load_data(self):
+        """Load data from files and index the exercises"""
+        exercise_files = os.listdir(os.path.join("data", "structured"))
+        
+        for filename in exercise_files:
+            file_path = os.path.join("data", "structured", filename)
+            if os.path.exists(file_path):
+                self.index_exercises_file(file_path)
+
 
     def add_exercise(self, exercise: Dict, video_id: str):
         """Add exercise to the vector store"""
@@ -62,19 +72,25 @@ class QuestionVectorStore:
             
         collection = self.collections["exercises"]
         
-        ids = []
-        documents = []
-        metadatas = []
-        
         # Create a unique ID for each exercise
         exercise_id = video_id
-        ids = [exercise_id]
+        id = exercise_id
+
+        existing_items = collection.query(
+            query_texts=[exercise['transcript']],
+            n_results=1  # Check for existence
+        )
+
+        # Check if the exercise already exists
+        if existing_items['metadatas']:
+            print(f"Exercise with ID {exercise_id} already exists in the vector store.")
+            return  # Exit if the exercise already exists
         
         # Store the full exercise structure as metadata
-        metadatas.append({
-        "video_id": video_id,
-        "full_structure": json.dumps(exercise)
-        })
+        metadata = {
+            "video_id": video_id,
+            "full_structure": json.dumps(exercise)
+        }
 
         document = f"""
         Exercise: {exercise['transcript']}
@@ -84,9 +100,9 @@ class QuestionVectorStore:
         
         # Add to collection
         collection.add(
-            ids=ids,
-            documents=documents,
-            metadatas=metadatas
+            ids=[id],
+            documents=[document],
+            metadatas=[metadata]
         )
 
 
@@ -104,21 +120,21 @@ class QuestionVectorStore:
         )
         
         # Convert results to more usable format
-        questions = []
+        exercises = []
         for idx, metadata in enumerate(results['metadatas'][0]):
-            question_data = json.loads(metadata['full_structure'])
-            question_data['similarity_score'] = results['distances'][0][idx]
-            questions.append(question_data)
+            exercise_data = json.loads(metadata['full_structure'])
+            exercise_data['similarity_score'] = results['distances'][0][idx]
+            exercises.append(exercise_data)
             
-        return questions
+        return exercises
 
 
-    def index_questions_file(self, filename: str):
-        """Index all questions from a file into the vector store"""
+    def index_exercises_file(self, filename: str):
+        """Index all exercises from a file into the vector store"""
         # Extract video ID from filename
         video_id = os.path.basename(filename).split('_section')[0]
         
-        # Parse questions from file
+        # Parse exercises from file
         with open(filename, "r") as f:
             exercise = json.load(f)
         
@@ -128,11 +144,12 @@ class QuestionVectorStore:
             print(f"Indexed exercise from {filename}")
 
 
+
 if __name__ == "__main__":
     # Example usage
-    store = QuestionVectorStore()
+    store = ExerciseVectorStore()
     
-    # Index questions from files
+    # Index exercises from files
     exercise_files = [
         "data/structured/Bdu-Bm7Yno8.json",
         "data/structured/j1YL56zE7kk.json",
@@ -141,8 +158,8 @@ if __name__ == "__main__":
     
     for filename in exercise_files:
         if os.path.exists(filename):
-            store.index_questions_file(filename)
+            store.index_exercises_file(filename)
     
-    # Search for similar questions
+    # Search for similar exercises
     similar = store.search_similar_exercises("Good food", n_results=1)
     print(similar)

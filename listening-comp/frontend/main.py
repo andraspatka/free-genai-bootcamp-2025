@@ -11,6 +11,7 @@ import os
 from backend.chat import BedrockChat
 from backend.get_transcript import YouTubeTranscriptDownloader
 from backend.structured_data import TranscriptStructurer
+from backend.rag import ExerciseVectorStore
 
 
 # Page config
@@ -296,19 +297,30 @@ def render_structured_stage():
 def render_rag_stage():
     """Render the RAG implementation stage"""
     st.header("RAG System")
-    
+
+    if 'exercise_vector_store' not in st.session_state:
+        st.session_state.exercise_vector_store = ExerciseVectorStore()
+        st.session_state.exercise_vector_store.load_data()
+
     # Query input
+    placeholder = "Enter a situation that you would like to practice"
     query = st.text_input(
         "Test Query",
-        placeholder="Enter a question about Japanese..."
+        placeholder=placeholder
     )
     
     col1, col2 = st.columns(2)
     
     with col1:
         st.subheader("Retrieved Context")
-        # Placeholder for retrieved contexts
-        st.info("Retrieved contexts will appear here")
+        if st.button("Search vector store"):
+            exercise = st.session_state.exercise_vector_store.search_similar_exercises(query, n_results=1)[0]
+            st.text_area(
+                label="Raw text",
+                value=exercise,
+                height=400,
+                disabled=True
+            )
         
     with col2:
         st.subheader("Generated Response")
