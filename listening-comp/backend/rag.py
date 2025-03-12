@@ -5,6 +5,8 @@ import os
 import boto3
 from typing import Dict, List, Optional
 
+from .chat import BedrockChat
+
 
 class BedrockEmbeddingFunction(embedding_functions.EmbeddingFunction):
     def __init__(self, model_id="amazon.titan-embed-text-v2:0"):
@@ -143,6 +145,57 @@ class ExerciseVectorStore:
             self.add_exercise(exercise, video_id)
             print(f"Indexed exercise from {filename}")
 
+
+class ExerciseGenerator:
+    def __init__(self):
+        """Initialize Bedrock client and vector store"""
+        self.bedrock_client = boto3.client('bedrock-runtime', region_name="us-east-1")
+        self.chat = BedrockChat()
+        self.vector_store = ExerciseVectorStore()  # Use ExerciseVectorStore
+        self.vector_store.load_data()
+
+
+    def _invoke_bedrock(self, prompt: str) -> Optional[str]:
+        return self.chat.generate_response(prompt)
+
+
+    def generate_similar_exercise(self, topic: str) -> Dict:
+        """Generate a new exercise similar to existing ones on a given topic"""
+        # Get similar exercises for context
+        similar_exercises = self.vector_store.search_similar_exercises(topic, n_results=3)
+        
+        if not similar_exercises:
+            return None
+        
+        # Create context from similar exercises
+        context = "Here are some example Italian listening exercises:\n\n"
+        for idx, ex in enumerate(similar_exercises, 1):
+            context += f"Example {idx}:\n"
+            context += f"Exercise: {ex.get('transcript', '')}\n"
+            context += f"English Translation: {ex.get('english_translation', '')}\n"
+            context += "\n"
+
+        # Create prompt for generating new exercise
+        prompt = f"""Based on the following example Italian listening exercises, create a new exercise about {topic}.
+        The exercise should follow the same format but be different from the examples.
+        Make sure the exercise tests listening comprehension and has a clear correct answer.
+        
+        {context}
+        
+        Generate a new exercise following the exact same format as above. Include all components (Exercise and English Translation).
+        Return ONLY the exercise in JSON format without any additional text. Example JSON format:
+        """ + """
+        {
+            "transcript": "the transcript",
+            "english_translation": "the english translation"
+        }
+        """
+
+        # Generate new exercise
+        response = self._invoke_bedrock(prompt)
+        if not response:
+            return None
+        return response
 
 
 if __name__ == "__main__":

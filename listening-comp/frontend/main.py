@@ -11,7 +11,7 @@ import os
 from backend.chat import BedrockChat
 from backend.get_transcript import YouTubeTranscriptDownloader
 from backend.structured_data import TranscriptStructurer
-from backend.rag import ExerciseVectorStore
+from backend.rag import ExerciseVectorStore, ExerciseGenerator
 
 
 # Page config
@@ -301,9 +301,12 @@ def render_rag_stage():
     if 'exercise_vector_store' not in st.session_state:
         st.session_state.exercise_vector_store = ExerciseVectorStore()
         st.session_state.exercise_vector_store.load_data()
+    if 'exercise_generator' not in st.session_state:
+        st.session_state.exercise_generator = ExerciseGenerator()
+
 
     # Query input
-    placeholder = "Enter a situation that you would like to practice"
+    placeholder = "Enter a situation that you would like to practice / A scenario to generate"
     query = st.text_input(
         "Test Query",
         placeholder=placeholder
@@ -324,8 +327,14 @@ def render_rag_stage():
         
     with col2:
         st.subheader("Generated Response")
-        # Placeholder for LLM response
-        st.info("Generated response will appear here")
+        if st.button("Generate new exercise"):
+            exercise = st.session_state.exercise_generator.generate_similar_exercise(query)
+            st.text_area(
+                label="Raw text",
+                value=exercise,
+                height=400,
+                disabled=True
+            )
 
 def render_interactive_stage():
     """Render the interactive learning stage"""
