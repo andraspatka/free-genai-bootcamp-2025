@@ -18,8 +18,8 @@ from backend.interactive import ListeningComprehension
 
 # Page config
 st.set_page_config(
-    page_title="Japanese Learning Assistant",
-    page_icon="🎌",
+    page_title="Italian Learning Assistant",
+    page_icon="🇮🇹",
     layout="wide"
 )
 
@@ -33,9 +33,9 @@ if 'transcript_structure' not in st.session_state:
 
 def render_header():
     """Render the header section"""
-    st.title("🎌 Japanese Learning Assistant")
+    st.title("🇮🇹 Italian Learning Assistant")
     st.markdown("""
-    Transform YouTube transcripts into interactive Japanese learning experiences.
+    Transform YouTube transcripts into interactive Italian learning experiences.
     
     This tool demonstrates:
     - Base LLM Capabilities
@@ -65,7 +65,7 @@ def render_sidebar():
         stage_info = {
             "1. Chat with Nova": """
             **Current Focus:**
-            - Basic Japanese learning
+            - Basic Italian learning
             - Understanding LLM capabilities
             - Identifying limitations
             """,
@@ -114,7 +114,7 @@ def render_chat_stage():
 
     # Introduction text
     st.markdown("""
-    Start by exploring Nova's base Japanese language capabilities. Try asking questions about Japanese grammar, 
+    Start by exploring Nova's base Italian language capabilities. Try asking questions about Italian grammar, 
     vocabulary, or cultural aspects.
     """)
 
@@ -128,7 +128,7 @@ def render_chat_stage():
             st.markdown(message["content"])
 
     # Chat input area
-    if prompt := st.chat_input("Ask about Japanese language..."):
+    if prompt := st.chat_input("Ask about Italian language..."):
         # Process the user input
         process_message(prompt)
 
@@ -136,12 +136,9 @@ def render_chat_stage():
     with st.sidebar:
         st.markdown("### Try These Examples")
         example_questions = [
-            "How do I say 'Where is the train station?' in Japanese?",
-            "Explain the difference between は and が",
-            "What's the polite form of 食べる?",
-            "How do I count objects in Japanese?",
-            "What's the difference between こんにちは and こんばんは?",
-            "How do I ask for directions politely?"
+            "How do I say 'Where is the train station?' in Italian?",
+            "How do I count objects in Italian?",
+            "How do I ask for directions politely in Italian?"
         ]
         
         for q in example_questions:
@@ -174,18 +171,18 @@ def process_message(message: str):
 
 
 def count_characters(text):
-    """Count Japanese and total characters in text"""
+    """Count Italian and total characters in text"""
     if not text:
         return 0, 0
         
-    def is_japanese(char):
+    def is_Italian(char):
         return any([
             '\u4e00' <= char <= '\u9fff',  # Kanji
             '\u3040' <= char <= '\u309f',  # Hiragana
             '\u30a0' <= char <= '\u30ff',  # Katakana
         ])
     
-    jp_chars = sum(1 for char in text if is_japanese(char))
+    jp_chars = sum(1 for char in text if is_Italian(char))
     return jp_chars, len(text)
 
 def render_transcript_stage():
@@ -195,7 +192,7 @@ def render_transcript_stage():
     # URL input
     url = st.text_input(
         "YouTube URL",
-        placeholder="Enter a Japanese lesson YouTube URL"
+        placeholder="Enter a Italian lesson YouTube URL"
     )
 
     if 'youtube_transcript_downloader' not in st.session_state:
@@ -246,7 +243,7 @@ def render_transcript_stage():
             
             # Display stats
             st.metric("Total Characters", total_chars)
-            st.metric("Japanese Characters", jp_chars)
+            st.metric("Italian Characters", jp_chars)
             st.metric("Total Lines", total_lines)
         else:
             st.info("Load a transcript to see statistics")
@@ -382,7 +379,7 @@ def render_interactive_stage():
     st.subheader("Practice Scenario")
     # Placeholder for scenario
     st.text_area(
-        label="Raw text",
+        label="Raw text - only for debugging purposes",
         value=st.session_state.interactive_exercise_data,
         height=400,
         disabled=True
@@ -410,7 +407,7 @@ def render_interactive_stage():
             correct_answer = st.session_state.interactive_exercise_questions["questions"][0]["correct_answer"]
             is_correct = choice == correct_answer
             st.text_area(
-                label="Raw text",
+                label="Feedback",
                 value=f"""
                     Your choice is {is_correct}
                     Feedback: {feedback}
