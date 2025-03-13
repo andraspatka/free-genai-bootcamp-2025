@@ -22,7 +22,7 @@ class AudioGenerator:
         os.makedirs(self.audio_dir, exist_ok=True)
 
 
-    def generate_audio_part(self, text: str, voice_name: str, video_id: str) -> str:
+    def generate_audio(self, text: str, voice_name: str, video_id: str) -> str:
         """Generate audio for a single part using Amazon Polly"""
         if os.path.exists(os.path.join(self.audio_dir, f"{video_id}.mp3")):
             return os.path.join(self.audio_dir, f"{video_id}.mp3")
@@ -41,12 +41,10 @@ class AudioGenerator:
 
 
 if __name__ == "__main__":
-    video_id = "VdiaPYEYJbc"
+    video_id = "xo2JBr0x58Q"
     with open(os.path.join("data", "structured", f"{video_id}.json")) as f:
-        text = f.read()
+        text_json = json.loads(json.load(f))
     
-    text_json = json.loads(json.loads(text))
-    print(type(text_json))
     transcript = text_json['transcript']
 
     try:
@@ -54,7 +52,7 @@ if __name__ == "__main__":
         generator = AudioGenerator()
         
         print("\nParsing conversation...")
-        audio_file = generator.generate_audio_part(transcript, voice_name="Carla", video_id=video_id)
+        audio_file = generator.generate_audio(transcript, voice_name="Carla", video_id=video_id)
 
         print(f"Audio file generated: {audio_file}")
     except Exception as e:

@@ -12,6 +12,8 @@ from backend.chat import BedrockChat
 from backend.get_transcript import YouTubeTranscriptDownloader
 from backend.structured_data import TranscriptStructurer
 from backend.rag import ExerciseVectorStore, ExerciseGenerator
+from backend.audio_generator import AudioGenerator
+from backend.interactive import ListeningComprehension
 
 
 # Page config
@@ -343,28 +345,80 @@ def render_interactive_stage():
     # Practice type selection
     practice_type = st.selectbox(
         "Select Practice Type",
-        ["Dialogue Practice", "Vocabulary Quiz", "Listening Exercise"]
+        ["Listening Exercise"]
+    )
+
+    if 'audio_generator' not in st.session_state:
+        st.session_state.audio_generator = AudioGenerator()
+    if 'listening_comprehension' not in st.session_state:
+        st.session_state.listening_comprehension = ListeningComprehension()
+    if 'audio_file_path' not in st.session_state:
+        st.session_state.audio_file_path = None
+    if 'interactive_exercise_data' not in st.session_state:
+        st.session_state.interactive_exercise_data = None
+    if 'interactive_exercise_video_data' not in st.session_state:
+        st.session_state.interactive_exercise_video_data = None
+    if 'interactive_exercise_questions' not in st.session_state:
+        st.session_state.interactive_exercise_questions = None
+    if 'interactive_exercise_selected' not in st.session_state:
+        st.session_state.interactive_exercise_selected = None
+    
+    st.subheader("Audio")
+    # Placeholder for audio player
+    if st.button("Get Listening Exercise"):
+        st.session_state.interactive_exercise_data, st.session_state.interactive_exercise_video_id = \
+            st.session_state.listening_comprehension.get_text()
+        st.session_state.audio_file_path = st.session_state.audio_generator.generate_audio(
+            st.session_state.interactive_exercise_data["transcript"],
+            voice_name="Carla",
+            video_id=st.session_state.interactive_exercise_video_id
+        )
+        st.audio(st.session_state.audio_file_path)
+        st.session_state.interactive_exercise_questions = st.session_state.listening_comprehension.generate_questions(
+            st.session_state.interactive_exercise_data["transcript"]
+        )
+
+
+    st.subheader("Practice Scenario")
+    # Placeholder for scenario
+    st.text_area(
+        label="Raw text",
+        value=st.session_state.interactive_exercise_data,
+        height=400,
+        disabled=True
     )
     
-    col1, col2 = st.columns([2, 1])
-    
-    with col1:
-        st.subheader("Practice Scenario")
-        # Placeholder for scenario
-        st.info("Practice scenario will appear here")
-        
-        # Placeholder for multiple choice
-        options = ["Option 1", "Option 2", "Option 3", "Option 4"]
-        selected = st.radio("Choose your answer:", options)
-        
-    with col2:
-        st.subheader("Audio")
-        # Placeholder for audio player
-        st.info("Audio will appear here")
-        
+    if st.session_state.interactive_exercise_questions:
+        st.text(st.session_state.interactive_exercise_questions["questions"][0]["question"])
+        options = [q["option"] for q in st.session_state.interactive_exercise_questions["questions"][0]["options"]]
+        selected = st.radio("Choose your answer:", options, key="interactive_exercise_question")
+        st.session_state.interactive_exercise_selected = selected
+
+    if st.button("Check"):
         st.subheader("Feedback")
-        # Placeholder for feedback
-        st.info("Feedback will appear here")
+        if st.session_state.interactive_exercise_selected:
+            choice = [
+                q["number"]
+                for q in st.session_state.interactive_exercise_questions["questions"][0]["options"] 
+                if q["option"] == st.session_state.interactive_exercise_selected
+            ][0]
+            feedback = [
+                q["feedback"]
+                for q in st.session_state.interactive_exercise_questions["questions"][0]["options"] 
+                if q["option"] == st.session_state.interactive_exercise_selected
+            ][0]
+            correct_answer = st.session_state.interactive_exercise_questions["questions"][0]["correct_answer"]
+            is_correct = choice == correct_answer
+            st.text_area(
+                label="Raw text",
+                value=f"""
+                    Your choice is {is_correct}
+                    Feedback: {feedback}
+                """,
+                height=400,
+                disabled=True
+            )
+
 
 def main():
     render_header()
