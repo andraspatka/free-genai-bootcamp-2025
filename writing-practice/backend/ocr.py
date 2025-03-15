@@ -38,10 +38,9 @@ class OCRProcessor:
 
     def tesseract_extract_text(self, image_path: str) -> str:
         """Extract text from the given image using Tesseract OCR."""
-        preprocessed_image_path = self.preprocess_image(image_path)
         try:
             # Open the image file
-            with Image.open(preprocessed_image_path) as img:
+            with Image.open(image_path) as img:
                 # Use pytesseract to do OCR on the image
                 text = pytesseract.image_to_string(img, lang='ita')  # Specify Italian language
             return text.strip()  # Return the extracted text
@@ -49,6 +48,7 @@ class OCRProcessor:
             print(f"Error during OCR processing: {str(e)}")
         
             return ""
+
 
     def textract_extract_text(self, document_path: str) -> dict:
         """Extract text from the given document using Amazon Textract."""
@@ -67,14 +67,14 @@ class OCRProcessor:
             return ""
 
 
-
-
 # Example usage
 if __name__ == "__main__":
     ocr_processor = OCRProcessor()
     input_image = 'libro_pretty_handwritten.jpg'
 
-    extracted_text = ocr_processor.tesseract_extract_text(f"data/images/{input_image}")
+    ocr_processor.preprocess_image(f"data/images/{input_image}")
+
+    extracted_text = ocr_processor.tesseract_extract_text(f"data/images/preprocessed_image.png")
     print(f"Extracted Text using tesseract: {extracted_text}")
-    extracted_text = ocr_processor.textract_extract_text(f"data/images/{input_image}")
+    extracted_text = ocr_processor.textract_extract_text(f"data/images/preprocessed_image.png")
     print(f"Extracted Text using textract: {extracted_text}")
