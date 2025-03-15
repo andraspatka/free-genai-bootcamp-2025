@@ -1,0 +1,7 @@
+[server]
+port = 8081
+
+[browser]
+serverAddress = 'localhost'
+serverPort = 8081
+gatherUsageStats = false
