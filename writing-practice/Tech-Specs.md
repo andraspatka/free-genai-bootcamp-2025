@@ -1,27 +1,33 @@
 # Technical Specs
 
+## Tech stack
+- Docker
+- docker-compose
+- Gradio
+- Python
+- Boto3 with nova for LLM
+- Pytesseract & tesseract for OCR of Italian text
+
 
 ## Initialization Step
 When the app first initializes it needs to the following:
-Fetch from the GET localhost:5000/api/groups/:id/raw, this will return a collection of words in a json structure. It will have japanese words with their english translation. We need to store this collection of words in memory
+Fetch from the GET localhost:5000/api/groups/:id/raw, this will return a collection of words in a json structure. It will have italian words with their english translation. We need to store this collection of words in memory
 
 ## Page States
 
 Page states describes the state the single page application should behaviour from a user's perspective. 
 
 ### Setup State
-When a user first's start up the app.
+When a user first starts up the app.
 They will only see a button called "Generate Sentence"
-When they press the button, The app will generate a sentence using
-the Sentence Genreator LLM, and the state will move to Practice State
+When they press the button, The app will generate a sentence using the Sentence Genereator LLM, and the state will move to **Practice State**
 
 ### Practice State
 When a user in is a practice state,
 they will see an english sentence,
 They will also see an upload field under the english sentence
 They will see a button called "Submit for Review"
-When they press the Submit for Review Button an uploaded image
-will be passed to the Grading System and then will transition to the Review State
+When they press the Submit for Review Button an uploaded image will be passed to the Grading System and then will transition to the **Review State**
 
 ### Review State
  When a user in is the review review state,
@@ -34,13 +40,13 @@ will be passed to the Grading System and then will transition to the Review Stat
   - a letter score using the S Rank to score
   - a description of whether the attempt was accurarte to the english sentence and suggestions.
 There will be a button called "Next Question" when clicked
-it will it generate a new question and place the app into Practice State
+it will it generate a new question and place the app into **Practice State**
 
 
 ## Sentence Generator LLM Prompt
 Generate a simple sentence using the following word: {{word}}
-The grammer should be scoped to JLPTN5 grammer.
-You can use the following vocabulary to construct a simple setnence:
+The grammer should be scoped to Italian CEFR A1 grammer.
+You can use the following vocabulary to construct a simple sentence:
 - simple objects eg. book, car, ramen, sushi
 - simple verbs, to drink, to eat, to meet
 - simple times eg. tommorrow, today, yesterday

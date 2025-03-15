@@ -1,0 +1,31 @@
+services:
+  italian-writing-practice:
+    container_name: italian-writing-practice
+    build: .
+    ports:
+      - "7860:7860"
+    environment:
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_REGION=${AWS_REGION}
+    volumes:
+      - ./backend:/app/backend
+      - ./frontend:/app/frontend
+      - ./data:/app/data
+    networks:
+      - italian-writing-practice
+  lang-portal-api:
+    build:
+      context: ../lang-portal/backend-flask
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - FLASK_ENV=development
+    volumes:
+      - ../lang-portal/backend-flask/words.db:/app/words.db
+    networks:
+      - italian-writing-practice
+networks:
+  italian-writing-practice:
+    driver: bridge
