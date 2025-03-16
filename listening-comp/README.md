@@ -29,7 +29,15 @@ Stop with:
 make stop
 ```
 
-Original source code from: https://github.com/labeveryday/language-learning-assistant
+# Domain knowledge acquired
+
+- Amazon's small models are really fast and they seem cost effective (at least for the PoC). It was able to handle more complicated prompts easily as well (e.g. generating new listening exercises from existing ones, generating questions from a listening exercise, structuring the transcript and translating it)
+- Telling the model to output JSON and providing an example structure makes parsing the response a LOT easier
+- Amazon Polly works very well and it has support for Italian too. Costs were minimal for the PoC, but for a production app it could start being expensive. It's also easy to use
+- It's easy to create UIs with streamlit but it takes a while to understand how it's working and to figure out how to structure the code for the UI
+- Generating new listening exercises from existing ones was really impressive with RAG. The result was surprisingly good.
+
+Original source code for starting off from: https://github.com/labeveryday/language-learning-assistant
 
 # language-learning-assistant
 This is for the generative AI bootcamp
