@@ -1,3 +1,34 @@
+# listening comprehension - Italian
+
+[Demonstration video](https://www.loom.com/share/31d9dd64bded46e39e31db92f5965e26?sid=d786a94f-82a9-4209-99cc-62da0ae7b3d9)
+
+Feature set:
+- Chat with Nova feature
+- Youtube transcript download
+- Youtube transcript structurize, translate to English
+- Store transcripts in vector DB.
+- Generate new content based on user query (using the vector DB)
+- Text to speech using Amazon Polly
+- Generate questions to test listening comprehension
+- Provide feedback on the user's response
+
+# How to start
+
+Requirements:
+- Docker
+- docker-compose
+- Make
+- AWS CLI keys with Bedrock Nova models with amazon.nova-micro-v1:0, amazon.titan-embed-text-v2:0 enabled
+
+Start with:
+```
+make start
+```
+Stop with:
+```
+make stop
+```
+
 Original source code from: https://github.com/labeveryday/language-learning-assistant
 
 # language-learning-assistant
