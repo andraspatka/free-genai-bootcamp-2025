@@ -33,7 +33,16 @@ def extract_without_preprocessing(image_path):
     return ocr_processor.textract_extract_text(image_path)
 
 def grade_translation(sentence_en, sentence_it):
-    return language_prompts.grade_translation(sentence_en, sentence_it).get('feedback')
+    grading = language_prompts.grade_translation(sentence_en, sentence_it)
+    feedback = grading['feedback']
+    score = grading['score']
+    is_correct = grading['is_correct']
+
+    return f"""
+Your translation is {"correct" if is_correct else "incorrect"}!
+Final score: {score}
+Feedback: {feedback}
+"""
 
 
 # Gradio Interface
