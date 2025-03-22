@@ -1,0 +1,16 @@
+services:
+  tf:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        UBUNTU_VERSION: 24.04
+        TERRAFORM_VERSION: 1.11.2
+        AWSCLI_VERSION: 2.25.1
+    container_name: tf
+    environment:
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      AWS_DEFAULT_REGION: ${AWS_DEFAULT_REGION}
+    volumes:
+      - ./iac:/infrastructure
