@@ -14,8 +14,8 @@ RUN apt-get update && \
 ### Mount Point ###
 # When launching the container, mount the code directory to /app
 ARG APP_MOUNT=/app
-VOLUME [ ${APP_MOUNT} ]
-WORKDIR ${APP_MOUNT}/vllm
+VOLUME [ $APP_MOUNT ]
+WORKDIR $APP_MOUNT/vllm
 RUN python3 -m pip install --upgrade pip
 RUN python3 -m pip install --no-cache-dir fastapi ninja tokenizers pandas
 RUN python3 -m pip install sentencepiece transformers==4.36.2 -U
@@ -35,11 +35,19 @@ EOF
 
 docker build . -t vllm-neuron
 
-# export HF_TOKEN="YOUR_TOKEN_HERE"
-# docker run \
-#         -it \
-#         -p 8000:8000 \
-#         --device /dev/neuron0 \
-#         -e HF_TOKEN=$HF_TOKEN \
-#         -e NEURON_CC_FLAGS=-O1 \
-#         vllm-neuron
+# Get HF_TOKEN from SSM Parameter Store
+export HF_TOKEN=$(aws ssm get-parameter --name "/${environment}-${project}/hf-token" --query "Parameter.Value" --output text)
+
+docker run \
+        -d \
+        -p 8000:8000 \
+        --device /dev/neuron0 \
+        -e HF_TOKEN=$HF_TOKEN \
+        -e NEURON_CC_FLAGS=-O1 \
+        vllm-neuron \
+        vllm serve meta-llama/Llama-3.2-1B \
+        --device neuron \
+        --tensor-parallel-size 2 \
+        --block-size 8 \
+        --max-model-len 4096 \
+        --max-num-seqs 32

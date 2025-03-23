@@ -80,6 +80,44 @@ resource "aws_iam_role_policy_attachment" "ssm_role_policy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
+resource "aws_iam_policy" "ssm_parameter_policy" {
+  name = "${local.environment}-${local.project}-ssm-parameter-policy"
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "ssm:GetParameter"
+        ]
+        Resource = [aws_ssm_parameter.hf_token.arn]
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "kms:Decrypt"
+        ]
+        Resource = ["arn:aws:kms:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:key/aws/ssm"]
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "ssm_parameter_policy" {
+  policy_arn = aws_iam_policy.ssm_parameter_policy.arn
+  role       = aws_iam_role.ssm_role.name
+}
+
+resource "aws_ssm_parameter" "hf_token" {
+  name  = "/${local.environment}-${local.project}/hf-token"
+  type  = "SecureString"
+  value = "dummy-value"
+
+  lifecycle {
+    ignore_changes = [value]
+  }
+}
+
 # Inspiration for running vllm on EC2
 # https://aws.amazon.com/blogs/machine-learning/serving-llms-using-vllm-and-amazon-ec2-instances-with-aws-ai-chips/
 resource "aws_launch_template" "launch_template" {
@@ -101,7 +139,10 @@ resource "aws_launch_template" "launch_template" {
     name = aws_iam_instance_profile.ssm_instance_profile.name
   }
 
-  user_data = filebase64("${path.module}/user_data.sh")
+  user_data = base64encode(templatefile("${path.module}/user_data.tftpl", {
+    environment = local.environment
+    project     = local.project
+  }))
 
   block_device_mappings {
     device_name = "/dev/sdh"
