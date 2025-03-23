@@ -1,4 +1,7 @@
 #!/bin/bash
+mkdir /home/ubuntu/vllm
+cd /home/ubuntu/vllm
+
 cat > Dockerfile <<\EOF
 # default base image
 ARG BASE_IMAGE="public.ecr.aws/neuron/pytorch-inference-neuronx:2.1.2-neuronx-py310-sdk2.20.0-ubuntu20.04"
@@ -36,7 +39,7 @@ EOF
 docker build . -t vllm-neuron
 
 # Get HF_TOKEN from SSM Parameter Store
-export HF_TOKEN=$(aws ssm get-parameter --name "/${environment}-${project}/hf-token" --query "Parameter.Value" --output text)
+export HF_TOKEN=$(aws ssm get-parameter --name "/${environment}-${project}/hf-token" --with-decryption --query "Parameter.Value" --output text)
 
 docker run \
         -d \
