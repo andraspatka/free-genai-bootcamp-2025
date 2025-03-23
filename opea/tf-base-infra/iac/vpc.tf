@@ -8,6 +8,7 @@ module "vpc" {
   enable_dns_support   = true
   enable_dns_hostnames = true
   enable_nat_gateway   = false
+  create_igw           = true
 
   public_subnets = [cidrsubnet(local.cidr, 2, 1)]
 

@@ -30,13 +30,31 @@ resource "aws_security_group" "allow_outbound_https" {
   description = "Allow outbound HTTPS connections to AWS service endpoints"
   vpc_id      = module.vpc.vpc_id
 
+  ingress {
+    from_port = 22
+    to_port   = 22
+    protocol  = "tcp"
+    cidr_blocks = [
+      "0.0.0.0/0"
+    ]
+  }
+
   # Allow outbound connections on port 443
   egress {
     from_port = 443
     to_port   = 443
     protocol  = "tcp"
     cidr_blocks = [
-      "0.0.0.0/0" # Allow outbound to all IPs on port 443
+      "0.0.0.0/0"
+    ]
+  }
+
+  egress {
+    from_port = 80
+    to_port   = 80
+    protocol  = "tcp"
+    cidr_blocks = [
+      "0.0.0.0/0"
     ]
   }
 }
@@ -67,9 +85,10 @@ resource "aws_iam_role_policy_attachment" "ssm_role_policy" {
 resource "aws_launch_template" "launch_template" {
   name = "${local.environment}-${local.project}-launch-template"
   # Deep Learning AMI Neuron (Ubuntu 22.04) 20241221
-  image_id             = "ami-05f04e4216ff500c0"
-  instance_type        = "inf2.xlarge"
-  security_group_names = [aws_security_group.allow_outbound_https.name]
+  image_id      = "ami-05f04e4216ff500c0"
+  instance_type = "inf2.xlarge"
+
+  key_name = "genai-test-ssh-keypair"
 
   instance_market_options {
     market_type = "spot"
@@ -91,6 +110,17 @@ resource "aws_launch_template" "launch_template" {
       volume_type           = "gp3"
       delete_on_termination = true
     }
+  }
+
+  metadata_options {
+    http_endpoint               = "enabled"
+    http_put_response_hop_limit = 1
+    http_tokens                 = "required"
+  }
+
+  network_interfaces {
+    associate_public_ip_address = true
+    security_groups             = [aws_security_group.allow_outbound_https.id]
   }
 
   lifecycle {
