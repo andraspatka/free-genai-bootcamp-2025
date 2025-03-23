@@ -28,7 +28,7 @@ test-text2sql:
 	# --data '{"user": "'postgres'","password": "'postgres'","host": "'localhost'", "port": "5442", "database": "'postgres'"}'
 	curl http://localhost:9090/v1/text2sql\
 		-X POST \
-		-d '{"input_text": "Find the total number of Albums.","conn_str": {"user": "'postgres'","password": "'postgres'","host": "'postgres'", "port": "5432", "database": "'postgres'"}}' \
+		-d '{"input_text": "Find the total number of Albums.","conn_str": {"user": "'postgres'","password": "'testpwd'","host": "'localhost'", "port": "5442", "database": "'chinook'"}}' \
 		-H 'Content-Type: application/json'
 
 pull:

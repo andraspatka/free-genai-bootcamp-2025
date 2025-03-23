@@ -29,4 +29,3 @@ Set path to terraform in terraform extension settings. Get the path like `which 
 ```json
 "terraform.languageServer.terraform.path": "/opt/homebrew/bin/terraform"
 ```
-```

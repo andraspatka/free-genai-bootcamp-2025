@@ -156,3 +156,14 @@ It's complaining about the Huggingface API not being set (401), but the issue ac
 It should be theoretically possible to rewrite the microservice to be compatible with Ollama API and to not use langchain, but that's too much work for not much gain.
 
 TGI not supported on M1: https://github.com/huggingface/text-generation-inference/issues/690
+
+## Run TGI on AWS with Xeon processors
+
+I gave OPEA another try by using AWS to have access to an Xeon processor instead of the M1.
+
+The infrastructure is provisioned using terraform `tf-infra` contains the IaC parts.
+
+The technical uncertainty in this case is:
+- Will I get text2sql working on AWS with an instance that has a Xeon processor?
+- Will I get vLLM working with AWS inf instances?
+- Is the performance going to be good? What are the limits that I can go to with a given instance type?

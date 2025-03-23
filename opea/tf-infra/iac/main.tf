@@ -28,4 +28,19 @@ locals {
     Environment = local.environment
     Project     = local.project
   }
+  asgs = {
+    "neuron" = {
+      "instance_type" : "inf2.xlarge",
+      "ami" : "ami-05f04e4216ff500c0",
+    }
+    "xeon" = {
+      "instance_type" : "m7i.xlarge",
+      "ami" : "ami-05f04e4216ff500c0",
+    }
+    # Nope; this is waaay too expensive (~13 USD per HOUR!)
+    # "gaudi" = {
+    #   "instance_type" : "dl1.24xlarge",
+    #   "ami" : "ami-05f04e4216ff500c0",
+    # }
+  }
 }
