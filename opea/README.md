@@ -165,5 +165,10 @@ The infrastructure is provisioned using terraform `tf-infra` contains the IaC pa
 
 The technical uncertainty in this case is:
 - Will I get text2sql working on AWS with an instance that has a Xeon processor?
+-> Yes and it's working well! It's slow but not sure if that's a limitation of the instance or the code.
 - Will I get vLLM working with AWS inf instances?
+-> Yes and it's working well!
 - Is the performance going to be good? What are the limits that I can go to with a given instance type?
+-> Attempted only 1 request at a time but the turnaround time for that was a couple of minutes already.
+
+Working demo video available at: https://youtu.be/96vAJkGMI_4
