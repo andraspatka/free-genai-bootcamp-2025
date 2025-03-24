@@ -10,7 +10,7 @@ module "vpc" {
   enable_nat_gateway   = false
   create_igw           = true
 
-  public_subnets = [cidrsubnet(local.cidr, 2, 1)]
+  public_subnets = [cidrsubnet(local.cidr, 2, 1), cidrsubnet(local.cidr, 2, 2)]
 
   tags = local.common_tags
 }

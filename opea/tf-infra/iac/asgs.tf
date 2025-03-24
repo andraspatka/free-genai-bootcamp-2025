@@ -9,7 +9,7 @@ resource "aws_autoscaling_group" "asg" {
   min_size            = 0
   max_size            = 1
   desired_capacity    = 0
-  vpc_zone_identifier = [module.vpc.public_subnets[0]]
+  vpc_zone_identifier = [module.vpc.public_subnets[0], module.vpc.public_subnets[1]]
 
   dynamic "tag" {
     for_each = local.common_tags
@@ -83,6 +83,9 @@ resource "aws_autoscaling_schedule" "scale_down_schedule" {
   desired_capacity       = 0
   start_time             = "2025-03-24T00:00:00Z" # UTC time for midnight
   recurrence             = "0 0 * * *"            # Every day at midnight UTC
+  lifecycle {
+    ignore_changes = [start_time]
+  }
 }
 
 resource "aws_ssm_parameter" "hf_token" {

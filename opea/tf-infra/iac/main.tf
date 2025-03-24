@@ -34,7 +34,7 @@ locals {
       "ami" : "ami-05f04e4216ff500c0",
     }
     "xeon" = {
-      "instance_type" : "m7i.xlarge",
+      "instance_type" : "m7i-flex.2xlarge",
       "ami" : "ami-05f04e4216ff500c0",
     }
     # Nope; this is waaay too expensive (~13 USD per HOUR!)

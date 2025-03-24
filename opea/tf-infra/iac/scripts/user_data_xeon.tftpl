@@ -19,9 +19,11 @@ export POSTGRES_PORT=5432
 cd GenAIComps/comps/text2sql/deployment/docker_compose
 docker compose -f compose.yaml up text2sql -d
 
-# test
+
 exit 0
-curl http://${your_ip}:9090/v1/text2sql\
+# Contain test query here for convenience; this won't be executed by the script
+# Have to wait about ~10-15 minutes for the containers to properly start up
+curl http://localhost:9090/v1/text2sql\
     -X POST \
     -d '{"input_text": "Find the total number of Albums.","conn_str": {"user": "'$POSTGRES_USER'","password": "'$POSTGRES_PASSWORD'","host": "'$POSTGRES_HOST'", "port": "'$POSTGRES_PORT'", "database": "'$POSTGRES_DB'"}}' \
     -H 'Content-Type: application/json'
