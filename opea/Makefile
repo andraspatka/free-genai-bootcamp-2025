@@ -1,4 +1,4 @@
-.PHONY: start stop test pull test-text2sql
+.PHONY: start stop test pull
 
 # Default target
 start:
@@ -21,15 +21,6 @@ test:
 		"model": "llama3.2:1b",\
 		"prompt":"Why is the sky blue?"\
 		}'
-
-test-text2sql:
-	# curl --location http://localhost:9090/v1/postgres/health \
-	# --header 'Content-Type: application/json' \
-	# --data '{"user": "'postgres'","password": "'postgres'","host": "'localhost'", "port": "5442", "database": "'postgres'"}'
-	curl http://localhost:9090/v1/text2sql\
-		-X POST \
-		-d '{"input_text": "Find the total number of Albums.","conn_str": {"user": "'postgres'","password": "'testpwd'","host": "'localhost'", "port": "5442", "database": "'chinook'"}}' \
-		-H 'Content-Type: application/json'
 
 pull:
 	curl http://localhost:8008/api/pull -d '{\
