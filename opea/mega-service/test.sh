@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Test the mega-service
+# This script contains all of the commands that need to be executed in order to test the mega-service
+
 export HF_TOKEN=$(aws ssm get-parameter --name "/poc-free-genai-bootcamp/hf-token" --with-decryption --query "Parameter.Value" --output text)
 # export LLM_MODEL_ID="meta-llama/Llama-3.2-1B"
 

@@ -9,7 +9,44 @@ make start # launch the services in docker-compose; this also pulls the image
 make test # execute an example query
 ```
 
-## OPEA comps that were tried out
+## Infrastructure
+
+The infrastructure is provisioned through Terraform.
+`tf-infra` contains the IaC parts.
+ASGs are used so that EC2 instances can easily be scaled down and up on demand.
+Spot nodes are also used to keep costs minimal.
+
+[See the terraform code](tf-infra/README.md)
+
+## Run TGI on AWS with Xeon processors
+
+I gave OPEA another try by using AWS to have access to an Xeon processor instead of the M1.
+
+The infrastructure is provisioned using terraform `tf-infra` contains the IaC parts.
+
+The technical uncertainty in this case is:
+- Will I get text2sql working on AWS with an instance that has a Xeon processor?
+-> Yes and it's working well! It's slow but not sure if that's a limitation of the instance or the code.
+- Will I get vLLM working with AWS inf instances?
+-> Yes and it's working well!
+- Is the performance going to be good? What are the limits that I can go to with a given instance type?
+-> Attempted only 1 request at a time but the turnaround time for that was a couple of minutes already.
+
+Working demo video available at: https://youtu.be/96vAJkGMI_4
+
+## OPEA Mega-service
+
+A new OPEA mega-service was implemented in order to gain more domain knowledge on OPEA.
+The mega-service is very similar to existing examples but it's a bit simpler.
+
+The mega service uses TGI for LLM and SPEECHT5 for speech synthesis. The user sends a prompt and gets the result in an audio file.
+
+See the demo here: 
+
+[See the code and more information](mega-service/README.md)
+
+
+## Past attempts: OPEA comps that were tried out (M1)
 
 Technical uncertainty:
 - Will text2sql work on a mac with m1?
@@ -157,18 +194,4 @@ It should be theoretically possible to rewrite the microservice to be compatible
 
 TGI not supported on M1: https://github.com/huggingface/text-generation-inference/issues/690
 
-## Run TGI on AWS with Xeon processors
 
-I gave OPEA another try by using AWS to have access to an Xeon processor instead of the M1.
-
-The infrastructure is provisioned using terraform `tf-infra` contains the IaC parts.
-
-The technical uncertainty in this case is:
-- Will I get text2sql working on AWS with an instance that has a Xeon processor?
--> Yes and it's working well! It's slow but not sure if that's a limitation of the instance or the code.
-- Will I get vLLM working with AWS inf instances?
--> Yes and it's working well!
-- Is the performance going to be good? What are the limits that I can go to with a given instance type?
--> Attempted only 1 request at a time but the turnaround time for that was a couple of minutes already.
-
-Working demo video available at: https://youtu.be/96vAJkGMI_4

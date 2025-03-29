@@ -4,7 +4,6 @@ from comps import MegaServiceEndpoint, MicroService, ServiceOrchestrator, Servic
 from comps.cores.proto.api_protocol import ChatCompletionRequest
 from comps.cores.proto.docarray import LLMParams
 from fastapi import Request, Response
-from fastapi.responses import StreamingResponse
 from comps.cores.mega.utils import handle_message
 
 import sys
@@ -22,7 +21,9 @@ if not LLM_MODEL_ID:
     print("ERROR: LLM_MODEL_ID not defined!")
     sys.exit(1)
 
-
+"""
+Align inputs for LLM and TTS services.
+"""
 def align_inputs(self, inputs, cur_node, runtime_graph, llm_parameters_dict, **kwargs):
     print("align_inputs")
     print(f"inputs: {inputs}")
@@ -56,6 +57,7 @@ class AudioQnAService:
         self.megaservice = ServiceOrchestrator()
 
         self.endpoint = str(MegaServiceEndpoint.AUDIO_QNA)
+
 
     def add_remote_service(self):
         tts = MicroService(
