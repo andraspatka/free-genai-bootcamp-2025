@@ -21,7 +21,7 @@ services:
       interval: 10s
       timeout: 10s
       retries: 100
-    command: --model-id ${LLM_MODEL_ID} --cuda-graphs 0
+    command: --model-id ${LLM_MODEL_ID:-llama3.2:1b} --cuda-graphs 0
   speecht5-service:
     image: ${REGISTRY:-opea}/speecht5:${TAG:-latest}
     container_name: speecht5-service
