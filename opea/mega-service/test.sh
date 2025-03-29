@@ -15,10 +15,10 @@ function llm_tts_test() {
   curl http://localhost:3008/v1/audioqna \
       -H "Content-Type: application/json" \
       -d '{
-          "messages": "Tell me a short story (maximum 4 sentences) about a robot learning to be human"
-      }' | tee audio_response.txt | tr -d '"' | base64 --decode > audio_reponse.mp3
+          "messages": "Tell me a joke"
+      }' | tr -d '"' | base64 --decode > audio_response_joke.mp3
 
-  aws s3 cp audio_response.mp3 s3://poc-free-genai-bootcamp-data/audio_reponse.mp3
+  aws s3 cp audio_response_joke.mp3 s3://poc-free-genai-bootcamp-data/audio_reponse_joke.mp3
 }
 
 function tgi_test() {

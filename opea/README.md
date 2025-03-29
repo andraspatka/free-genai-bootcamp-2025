@@ -41,7 +41,11 @@ The mega-service is very similar to existing examples but it's a bit simpler.
 
 The mega service uses TGI for LLM and SPEECHT5 for speech synthesis. The user sends a prompt and gets the result in an audio file.
 
-See the demo here: 
+See the demo here: https://www.loom.com/share/b3764ee22fc94ff1a3d94e376ca9df0b?sid=f0dcc959-647f-4679-8c7c-4d7454dcc0a9
+
+Results:
+- The mega service works, it routes the requests successfully to TGI and then its response to SpeechT5
+- For some reason the result seem repetitive and it looks like the LLM doesn't know when to stop. Or there's an issue with the mega service where it's looping the requests. This will need to be investigated further.
 
 [See the code and more information](mega-service/README.md)
 
