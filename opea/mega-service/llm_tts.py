@@ -23,14 +23,14 @@ def align_inputs(self, inputs, cur_node, runtime_graph, llm_parameters_dict, **k
         # convert TGI/vLLM to unified OpenAI /v1/chat/completions format
         next_inputs = {}
         next_inputs["model"] = LLM_MODEL_ID
-        next_inputs["messages"] = [{"role": "user", "content": inputs["prompt"]}]
+        next_inputs["messages"] = inputs["messages"] if "messages" in inputs else [{"role": "user", "content": inputs.get("prompt", "")}]
         next_inputs["max_tokens"] = llm_parameters_dict["max_tokens"]
         next_inputs["top_p"] = llm_parameters_dict["top_p"]
-        next_inputs["stream"] = inputs["stream"]  # False as default
-        next_inputs["frequency_penalty"] = inputs["frequency_penalty"]
+        next_inputs["stream"] = inputs.get("stream", False)  # False as default
+        next_inputs["frequency_penalty"] = inputs.get("frequency_penalty", 0.0)
         # next_inputs["presence_penalty"] = inputs["presence_penalty"]
         # next_inputs["repetition_penalty"] = inputs["repetition_penalty"]
-        next_inputs["temperature"] = inputs["temperature"]
+        next_inputs["temperature"] = inputs.get("temperature", 0.01)
         inputs = next_inputs
     elif self.services[cur_node].service_type == ServiceType.TTS:
         next_inputs = {}
@@ -73,6 +73,17 @@ class AudioQnAService:
         data = await request.json()
 
         chat_request = ChatCompletionRequest.parse_obj(data)
+        
+        # Extract the prompt from the messages
+        prompt = ""
+        if isinstance(chat_request.messages, list) and len(chat_request.messages) > 0:
+            if isinstance(chat_request.messages[0], dict) and "content" in chat_request.messages[0]:
+                prompt = chat_request.messages[0]["content"]
+            elif isinstance(chat_request.messages[0], str):
+                prompt = chat_request.messages[0]
+        elif isinstance(chat_request.messages, str):
+            prompt = chat_request.messages
+            
         parameters = LLMParams(
             # relatively lower max_tokens for audio conversation
             max_tokens=chat_request.max_tokens if chat_request.max_tokens else 128,
@@ -85,7 +96,7 @@ class AudioQnAService:
             stream=False,  # TODO add stream LLM output as input to TTS
         )
         result_dict, runtime_graph = await self.megaservice.schedule(
-            initial_inputs={"prompt": chat_request.prompt},
+            initial_inputs={"messages": chat_request.messages, "prompt": prompt},
             llm_parameters=parameters,
             voice=chat_request.voice if hasattr(chat_request, "voice") else "default",
         )
