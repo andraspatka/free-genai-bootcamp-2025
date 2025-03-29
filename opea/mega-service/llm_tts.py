@@ -7,6 +7,8 @@ from fastapi import Request, Response
 from fastapi.responses import StreamingResponse
 from comps.cores.mega.utils import handle_message
 
+import sys
+
 MEGA_SERVICE_PORT = int(os.getenv("MEGA_SERVICE_PORT", 8888))
 
 SPEECHT5_SERVER_HOST_IP = os.getenv("SPEECHT5_SERVER_HOST_IP", "0.0.0.0")
@@ -17,7 +19,11 @@ TTS_SPEECHT5_SERVER_PORT = int(os.getenv("TTS_SPEECHT5_SERVER_PORT", 9088))
 
 LLM_SERVER_HOST_IP = os.getenv("LLM_SERVER_HOST_IP", "0.0.0.0")
 LLM_SERVER_PORT = int(os.getenv("LLM_SERVER_PORT", 80))
-LLM_MODEL_ID = os.getenv("LLM_MODEL_ID", "meta-llama/Llama-3.2-1B")
+
+LLM_MODEL_ID = os.getenv("LLM_MODEL_ID")
+if not LLM_MODEL_ID:
+    print("ERROR: LLM_MODEL_ID not defined!")
+    sys.exit(1)
 
 
 def align_inputs(self, inputs, cur_node, runtime_graph, llm_parameters_dict, **kwargs):
@@ -28,7 +34,7 @@ def align_inputs(self, inputs, cur_node, runtime_graph, llm_parameters_dict, **k
         # convert TGI/vLLM to unified OpenAI /v1/chat/completions format
         next_inputs = {}
         next_inputs["model"] = LLM_MODEL_ID
-        next_inputs["messages"] = [{"role": "user", "content": inputs["message"]}]
+        next_inputs["messages"] = [{"role": "user", "content": inputs["text"]}]
         next_inputs["max_tokens"] = llm_parameters_dict["max_tokens"]
         next_inputs["top_p"] = llm_parameters_dict["top_p"]
         next_inputs["stream"] = inputs["stream"]  # False as default
