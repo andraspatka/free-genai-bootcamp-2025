@@ -4,5 +4,6 @@ services:
     environment:
       PYTHONUNBUFFERED: 1
       OPENAI_API_KEY: ${OPENAI_API_KEY}
-    entrypoint: ["sleep", "infinity"]
-    
+    entrypoint: ["watchfiles", "sleep infinity", "/app"]
+    volumes:
+      - ./app:/app

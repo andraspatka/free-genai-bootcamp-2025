@@ -4,8 +4,8 @@ WORKDIR /app
 
 COPY ./requirements.txt requirements.txt
 
-RUN pip install -r requirements.txt
+RUN pip install -r requirements.txt && pip install watchfiles
 
 COPY app /app
 
-CMD ["python", "main.py"]
+CMD ["watchfiles", "python main.py", "/app"]
