@@ -4,26 +4,38 @@ set -euox pipefail
 mkdir -p /home/ubuntu/opea
 cd /home/ubuntu/opea
 
-git clone https://github.com/opea-project/GenAIComps.git
-
-export your_ip=localhost
-export TGI_LLM_ENDPOINT=http://tgi-server:80
 export HF_TOKEN=$(aws ssm get-parameter --name "/${environment}-${project}/hf-token" --with-decryption --query "Parameter.Value" --output text)
-export LLM_MODEL_ID="mistralai/Mistral-7B-Instruct-v0.3"
-export POSTGRES_USER=postgres
-export POSTGRES_PASSWORD=testpwd
-export POSTGRES_DB=chinook
-export POSTGRES_HOST=postgres
-export POSTGRES_PORT=5432
 
-cd GenAIComps/comps/text2sql/deployment/docker_compose
-docker compose -f compose.yaml up text2sql -d
+function text2sql() {
+    git clone https://github.com/opea-project/GenAIComps.git
+
+    export your_ip=localhost
+    export TGI_LLM_ENDPOINT=http://tgi-server:80
+    export LLM_MODEL_ID="mistralai/Mistral-7B-Instruct-v0.3"
+    export POSTGRES_USER=postgres
+    export POSTGRES_PASSWORD=testpwd
+    export POSTGRES_DB=chinook
+    export POSTGRES_HOST=postgres
+    export POSTGRES_PORT=5432
+
+    cd GenAIComps/comps/text2sql/deployment/docker_compose
+    docker compose -f compose.yaml up text2sql -d
 
 
-exit 0
-# Contain test query here for convenience; this won't be executed by the script
-# Have to wait about ~10-15 minutes for the containers to properly start up
-curl http://localhost:9090/v1/text2sql\
-    -X POST \
-    -d '{"input_text": "Find the total number of Albums.","conn_str": {"user": "'$POSTGRES_USER'","password": "'$POSTGRES_PASSWORD'","host": "'$POSTGRES_HOST'", "port": "'$POSTGRES_PORT'", "database": "'$POSTGRES_DB'"}}' \
-    -H 'Content-Type: application/json'
+    exit 0
+    # Contain test query here for convenience; this won't be executed by the script
+    # Have to wait about ~10-15 minutes for the containers to properly start up
+    curl http://localhost:9090/v1/text2sql\
+        -X POST \
+        -d '{"input_text": "Find the total number of Albums.","conn_str": {"user": "'$POSTGRES_USER'","password": "'$POSTGRES_PASSWORD'","host": "'$POSTGRES_HOST'", "port": "'$POSTGRES_PORT'", "database": "'$POSTGRES_DB'"}}' \
+        -H 'Content-Type: application/json'
+}
+
+function mega-tts-qna() {
+    git clone https://github.com/andraspatka/free-genai-bootcamp-2025.git
+    cd free-genai-bootcamp-2025/opea/mega-service
+    docker compose -f docker-compose.yaml up -d
+}
+
+# text2sql
+mega-tts-qna
