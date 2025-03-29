@@ -46,7 +46,6 @@ services:
     depends_on:
       - tgi-server
       - speecht5-service
-      - tts-speecht5
     ports:
       - "3008:8888"
     environment:
