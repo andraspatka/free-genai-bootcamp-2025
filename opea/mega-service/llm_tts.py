@@ -14,9 +14,6 @@ MEGA_SERVICE_PORT = int(os.getenv("MEGA_SERVICE_PORT", 8888))
 SPEECHT5_SERVER_HOST_IP = os.getenv("SPEECHT5_SERVER_HOST_IP", "0.0.0.0")
 SPEECHT5_SERVER_PORT = int(os.getenv("SPEECHT5_SERVER_PORT", 7055))
 
-TTS_SPEECHT5_SERVER_HOST_IP = os.getenv("TTS_SPEECHT5_SERVER_HOST_IP", "0.0.0.0")
-TTS_SPEECHT5_SERVER_PORT = int(os.getenv("TTS_SPEECHT5_SERVER_PORT", 9088))
-
 LLM_SERVER_HOST_IP = os.getenv("LLM_SERVER_HOST_IP", "0.0.0.0")
 LLM_SERVER_PORT = int(os.getenv("LLM_SERVER_PORT", 80))
 
@@ -63,8 +60,8 @@ class AudioQnAService:
     def add_remote_service(self):
         tts = MicroService(
             name="tts",
-            host=TTS_SPEECHT5_SERVER_HOST_IP,
-            port=TTS_SPEECHT5_SERVER_PORT,
+            host=SPEECHT5_SERVER_HOST_IP,
+            port=SPEECHT5_SERVER_PORT,
             endpoint="/v1/tts",
             use_remote_service=True,
             service_type=ServiceType.TTS,
