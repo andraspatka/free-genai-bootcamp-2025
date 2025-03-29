@@ -1,5 +1,4 @@
-  
-services:
+  services:
   tgi-server:
     image: ghcr.io/huggingface/text-generation-inference:2.4.0-intel-cpu
     container_name: tgi-server
@@ -39,19 +38,14 @@ services:
       interval: 10s
       timeout: 6s
       retries: 18
-  tts:
+  tts-speecht5:
     image: ${REGISTRY:-opea}/tts:${TAG:-latest}
-    container_name: tts-service
+    container_name: tts-speecht5-service
     ports:
       - ${TTS_PORT:-9088}:9088
     ipc: host
     environment:
       TTS_ENDPOINT: ${TTS_ENDPOINT}
-      TTS_COMPONENT_NAME: ${TTS_COMPONENT_NAME:-OPEA_SPEECHT5_TTS}
-  tts-speecht5:
-    extends: tts
-    container_name: tts-speecht5-service
-    environment:
       TTS_COMPONENT_NAME: ${TTS_COMPONENT_NAME:-OPEA_SPEECHT5_TTS}
     depends_on:
       speecht5-service:
