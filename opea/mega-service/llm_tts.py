@@ -1,9 +1,10 @@
 import os
 
 from comps import MegaServiceEndpoint, MicroService, ServiceOrchestrator, ServiceRoleType, ServiceType
-from comps.cores.proto.api_protocol import ChatCompletionRequest, AudioChatCompletionResponse
+from comps.cores.proto.api_protocol import ChatCompletionRequest
 from comps.cores.proto.docarray import LLMParams
-from fastapi import Request
+from fastapi import Request, Response
+from fastapi.responses import StreamingResponse
 
 MEGA_SERVICE_PORT = int(os.getenv("MEGA_SERVICE_PORT", 8888))
 
@@ -90,9 +91,13 @@ class AudioQnAService:
         )
 
         last_node = runtime_graph.all_leaves()[-1]
-        response = result_dict[last_node]["tts_result"]
+        audio_data = result_dict[last_node]["tts_result"]
 
-        return response
+        # Return audio data as a streaming response
+        return StreamingResponse(
+            iter([audio_data]),
+            media_type="audio/wav"
+        )
 
     def start(self):
         self.service = MicroService(
@@ -102,7 +107,7 @@ class AudioQnAService:
             port=self.port,
             endpoint=self.endpoint,
             input_datatype=ChatCompletionRequest,
-            output_datatype=AudioChatCompletionResponse,
+            output_datatype=Response,
         )
         self.service.add_route(self.endpoint, self.handle_request, methods=["POST"])
         self.service.start()
