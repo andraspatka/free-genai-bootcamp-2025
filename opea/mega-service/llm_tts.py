@@ -20,6 +20,9 @@ LLM_MODEL_ID = os.getenv("LLM_MODEL_ID", "meta-llama/Llama-3.2-1B")
 
 
 def align_inputs(self, inputs, cur_node, runtime_graph, llm_parameters_dict, **kwargs):
+    print("align_inputs")
+    print(f"inputs: {inputs}")
+    print(f"node: {cur_node}")
     if self.services[cur_node].service_type == ServiceType.LLM:
         # convert TGI/vLLM to unified OpenAI /v1/chat/completions format
         next_inputs = {}
@@ -72,6 +75,8 @@ class AudioQnAService:
 
 
     async def handle_request(self, request: Request):
+        print("handle_request")
+        print(f"request: {request}")
         data = await request.json()
 
         chat_request = ChatCompletionRequest.parse_obj(data)
