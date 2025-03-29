@@ -1,0 +1,8 @@
+services:
+  ai-agents:
+    build: .
+    environment:
+      PYTHONUNBUFFERED: 1
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+    entrypoint: ["sleep", "infinity"]
+    
