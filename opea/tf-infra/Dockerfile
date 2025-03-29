@@ -1,4 +1,6 @@
-ARG UBUNTU_VERSION
+ARG UBUNTU_VERSION=24.04
+ARG TERRAFORM_VERSION=1.11.2
+ARG AWSCLI_VERSION=2.25.1
 
 FROM ubuntu:${UBUNTU_VERSION}
 
@@ -16,19 +18,19 @@ VOLUME /infrastructure
 RUN apt update && apt install -y git
 
 RUN apt update && apt install -y wget unzip &&  \
-  wget https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_arm.zip && \
-  unzip terraform_${TERRAFORM_VERSION}_linux_arm.zip && \
+  wget https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip && \
+  unzip terraform_${TERRAFORM_VERSION}_linux_amd64.zip && \
   mv terraform /usr/local/bin/
 
-RUN apt update && apt install -y zip curl mandoc less jq && \
-    curl "https://awscli.amazonaws.com/awscli-exe-linux-aarch64-${AWSCLI_VERSION}.zip" -o "awscliv2.zip" && \
-    unzip awscliv2.zip && \
-    ./aws/install && \
-    rm -rf awscliv2.zip ./aws/install && \
-    apt remove -y zip
+  RUN apt update && apt install -y zip curl mandoc less jq && \
+  curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-${AWSCLI_VERSION}.zip" -o "awscliv2.zip" && \
+  unzip awscliv2.zip && \
+  ./aws/install && \
+  rm -rf awscliv2.zip ./aws/install && \
+  apt remove -y zip
 
 # session manager plugin
-RUN curl "https://s3.amazonaws.com/session-manager-downloads/plugin/latest/ubuntu_arm64/session-manager-plugin.deb" -o "session-manager-plugin.deb" && \
+RUN curl "https://s3.amazonaws.com/session-manager-downloads/plugin/latest/ubuntu_64bit/session-manager-plugin.deb" -o "session-manager-plugin.deb" && \
     dpkg -i session-manager-plugin.deb && \
     rm -rf session-manager-plugin.deb
 

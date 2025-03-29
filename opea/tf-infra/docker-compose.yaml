@@ -8,6 +8,11 @@ services:
         TERRAFORM_VERSION: 1.11.2
         AWSCLI_VERSION: 2.25.1
     container_name: tf
+    # For some reason terraform on ARM native is REALLY slow
+    # Reason maybe? https://github.com/hashicorp/terraform/issues/31467?source=post_page-----abdc88a08b32---------------------------------------
+    # Best to just use AMD64 version as that's a lot faster
+    # Only reason to do ARM is to make it faster, but it's actually slower...
+    platform: linux/amd64
     environment:
       AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
       AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
