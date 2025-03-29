@@ -5,6 +5,7 @@ from comps.cores.proto.api_protocol import ChatCompletionRequest
 from comps.cores.proto.docarray import LLMParams
 from fastapi import Request, Response
 from fastapi.responses import StreamingResponse
+from comps.cores.mega.utils import handle_message
 
 MEGA_SERVICE_PORT = int(os.getenv("MEGA_SERVICE_PORT", 8888))
 
