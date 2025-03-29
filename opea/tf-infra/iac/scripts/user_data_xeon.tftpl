@@ -7,7 +7,6 @@ cd /home/ubuntu/opea
 export HF_TOKEN=$(aws ssm get-parameter --name "/${environment}-${project}/hf-token" --with-decryption --query "Parameter.Value" --output text)
 
 
-
 function text2sql() {
     git clone https://github.com/opea-project/GenAIComps.git
 
@@ -34,7 +33,7 @@ function text2sql() {
 }
 
 function mega-tts-qna() {
-    export LLM_MODEL_ID="meta-llama/Llama-3.2-1B"
+    export LLM_MODEL_ID="ministral/Ministral-3b-instruct"
     git clone https://github.com/andraspatka/free-genai-bootcamp-2025.git
     cd free-genai-bootcamp-2025/opea/mega-service
     docker compose -f docker-compose.yaml up -d
