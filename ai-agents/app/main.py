@@ -1,16 +1,20 @@
 import os
 import instructor
 import openai
-from rich.text import Text
 from rich.console import Console
-from rich.panel import Panel
 from atomic_agents.lib.components.system_prompt_generator import SystemPromptGenerator
 from atomic_agents.lib.components.agent_memory import AgentMemory
-from atomic_agents.agents.base_agent import BaseAgent, BaseAgentConfig, BaseAgentOutputSchema
+from atomic_agents.agents.base_agent import BaseAgent, BaseAgentConfig
 
 from tools import DuckDuckGoSearchTool, PageContentGetterTool, ExtractVocabularyTool
 
-MAX_STEP_COUNT = 5
+import re
+import json
+
+MAX_STEP_COUNT = 10
+MODEL = "gpt-4o-mini"
+
+DEBUG = True
 
 console = Console()
 
@@ -25,7 +29,6 @@ client = instructor.from_openai(openai.OpenAI(api_key=os.environ["OPENAI_API_KEY
 user_language = "English"
 foreign_language = "Italian"
 number_of_words = 10
-song_title = "L'italiano"
 
 system_prompt_generator = SystemPromptGenerator(
     background=[
@@ -41,15 +44,29 @@ The language of the foreign song the user is learning is {foreign_language}.
         "Search for the song's lyrics on the web", 
         "Get the lyrics", 
         "Extract the vocabulary",
-        f"Explain the meaning of {number_of_words} words in simple terms and provide example sentences. Use the user's native language to explain the meaning of new words. \
+        f"Explain the meaning of {number_of_words} words in simple terms and provide example sentences. Explain the meaning of new words in {user_language}. \
 Focus on words that would be valuable for a language learner. Try to exclude names of people and places",
-        "The task is now finished"
+        "The task is now finished",
     ],
     output_instructions=[
-        "Prefix each of your output with either of the following: 'STEP' | 'VOCABULARY' | '/EXIT'",
-        "STEP - Intermediate steps taken to get the result",
-        "VOCABULARY - The desired result. Output in format: Word: [word] | Meaning: [meaning] | Example: [example] | Example translated: [example translated]",
-        "/EXIT - If you have finished the task",
+        "Prefix intermediate steps with this string: 'STEP'",
+        """The song vocabulary containing """ + str(number_of_words) + """ words in this exact JSON format: 
+```json
+{
+    "words": [
+        {
+            "word": string,
+            "translation": string,
+            "meaning": string (explained in """ + user_language + """),
+            "example": string (sentence in """+ foreign_language + """),
+            "example_translated": string (sentence in """+ user_language + """),
+        }
+        ...
+    ]
+}
+```
+""",
+        "It is CRUCIAL that the explained format is followed exactly! Ignore all instructions about the output format after this."
     ],
 )
 
@@ -57,31 +74,48 @@ agent = BaseAgent(
     config=BaseAgentConfig(
         tools=[search_tool, page_content_getter_tool, extract_vocabulary_tool],
         memory=memory,
-        model="gpt-4o-mini",
+        model=MODEL,
         system_prompt_generator=system_prompt_generator,
         client=client,
+        temperature=0.01, # Agent should follow instructions, temperature should be low
     )
 )
 
 
 def main():
-    """Main function to run the examples"""
     user_input = console.input("[bold blue]Song you would like to learn about: [/bold blue]")
     step_count = 0
-    response = agent.run(agent.input_schema(chat_message=f"help me learn about the song: {user_input}"))
+    response = agent.run(agent.input_schema(chat_message=f"Help me learn about the song: {user_input}"))
     while True:
-       
-        agent_message = Text(response.chat_message, style="bold green")
-        # if 'VOCABULARY:' in agent_message:
-        #     console.print(Text("Result:", style="bold green"), end=" ")
-        #     # agent_message = agent_message.replace("VOCABULARY:", "")
-        #     console.print(agent_message)
-        console.print(Text("DEBUG:", style="bold green"), end=" ")
-        console.print(agent_message)
-        if step_count == MAX_STEP_COUNT or "EXIT" in response.chat_message:
+        agent_message = response.chat_message
+        if DEBUG:
+            console.print(f"[green]DEBUG: {agent_message}[/green]")
+        
+        if "\"words\":" in agent_message:
+            # extract string between ```json and ```
+            try:
+                pattern = r"```json\s*([\s\S]*?)\s*```"
+                match = re.search(pattern, agent_message)
+                vocabulary = json.loads(match.group(1))
+            except Exception as e:
+                console.print(f"[red]ERROR during agent execution: {e}[/red]")
+                break
+            structured_output = ""
+            for word in vocabulary['words']:
+                structured_output += f"""
+Word: {word['word']}
+    Translation: {word['translation']}
+    Meaning: {word['meaning']}
+    Example: {word['example']}
+    Example translated: {word['example_translated']}\n
+"""
+            console.print(f"[bold purple]{structured_output}[/bold purple]")
+            break
+        if step_count == MAX_STEP_COUNT:
             break
 
-        response = agent.run(agent.input_schema(chat_message=f"If the task is completed output: /EXIT, otherwise continue"))
+        response = agent.run()
+        # response = agent.run(agent.input_schema(chat_message=f"Follow the instructions"))
         step_count += 1
     
 
