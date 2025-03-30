@@ -12,7 +12,7 @@ import re
 import json
 
 MAX_STEP_COUNT = 10
-MODEL = "gpt-4o-mini"
+MODEL = "gpt-4o"
 
 DEBUG = True
 
@@ -85,7 +85,7 @@ agent = BaseAgent(
 def main():
     user_input = console.input("[bold blue]Song you would like to learn about: [/bold blue]")
     step_count = 0
-    response = agent.run(agent.input_schema(chat_message=f"Help me learn about the song: {user_input}"))
+    response = agent.run(agent.input_schema(chat_message=f"Help me learn about the song: {user_input}. In case multiple songs are mentioned, pick the one by the Italian artist."))
     while True:
         agent_message = response.chat_message
         if DEBUG:

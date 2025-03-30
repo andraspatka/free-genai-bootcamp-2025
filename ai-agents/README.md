@@ -41,6 +41,11 @@ I was very impressed by this.
 The only complaint I had about tool use, was that the code was very verbose. A lot of things had to be defined, and this turned a simple function with 4 lines into ~100 lines of code.
 But this can also be because of my inexperience with the framework.
 
+### Model
+
+I used initially `gpt-4o-mini` but this requires a bit of hand holding.
+The full model `gpt-4o` performed much better and was much more reliable.
+
 ### Conclusion
 
 I was very impressed by the framework. It's still very new and some more documentation would be nice, but it's very simple to use and after a bit of searching it becomes very intuitive and obvious where things should be implemented.
