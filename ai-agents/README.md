@@ -4,6 +4,17 @@ The goal is to reimplement the Song vocabulary agent from: https://gist.github.c
 
 Using either a framework or implementing everything from scratch.
 
+## Running the project
+
+Prerequisistes:
+- Docker
+- Docker compose
+- OpenAI API key
+
+Instructions:
+- Add OPENAI_API_KEY to `.env` (see `.env.template`)
+- Start up with `main.sh`
+
 ## Framework
 
 Atomic agents has gotten a lot of love lately, as it aims to be simple and developer friendly.
@@ -24,7 +35,6 @@ It instead does just 1 iteration, but that also makes sense as in this case the 
 
 I settled on just asking the model to give a specific input when it is done. I added this initially to the system prompt only, but that wasn't reliable enough.
 I ended up adding it to multiple places, and also constrainting the number of words that it should generate out, as sometimes it just kept on going.
-
 
 I tried also to tell the model to give either as prefix to the output "STEP" "VOCABULARY" or "EXIT". It didn't always give the "EXIT" part and it was hard to convince the model to do so. I realised though, that "EXIT" is redundant, and if "VOCABULARY" is in the output, then that means the task is already done.
 
@@ -63,3 +73,7 @@ The step count was also reduced, as realistically the task should be completed i
 ### Conclusion
 
 I was very impressed by the framework. It's still very new and some more documentation would be nice, but it's very simple to use and after a bit of searching it becomes very intuitive and obvious where things should be implemented.
+
+## Demo
+
+TODO: Add demo video
