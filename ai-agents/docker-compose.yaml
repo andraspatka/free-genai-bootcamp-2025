@@ -7,3 +7,5 @@ services:
     entrypoint: ["sleep", "infinity"]
     volumes:
       - ./app:/app
+    ports:
+      - "5678:5678"  # Expose debugpy port
