@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: language_exercise_db
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-exercise_db} # Default DB name if not in .env
+      POSTGRES_USER: ${POSTGRES_USER:-user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432" # Expose DB port, default 5432
+    networks:
+      - app-network
+    restart: unless-stopped
+    healthcheck:
+        test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-user} -d ${POSTGRES_DB:-exercise_db}"]
+        interval: 10s
+        timeout: 5s
+        retries: 5
+
+  app:
+    build:
+      context: ../../ # Build context is the project root
+      dockerfile: deploy/docker/Dockerfile
+    container_name: language_exercise_app
+    env_file:
+      - ../../.env # Load environment variables from .env file in project root
+    ports:
+      - "${APP_PORT:-8501}:8501" # Expose Streamlit port, default 8501
+    volumes:
+      # Mount the source code for development (optional, remove for production)
+      # Allows code changes without rebuilding image
+      - ../../:/app
+    networks:
+      - app-network
+    depends_on:
+      postgres:
+        condition: service_healthy # Wait for postgres to be ready
+    restart: unless-stopped
+    # Environment variables needed by the app (can also be set in .env)
+    # environment:
+    #   - DATABASE_URL=postgresql+psycopg2://${POSTGRES_USER:-user}:${POSTGRES_PASSWORD:-password}@postgres:${POSTGRES_DB_PORT:-5432}/${POSTGRES_DB:-exercise_db}
+    #   - OPENAI_API_KEY=${OPENAI_API_KEY}
+    #   - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+    #   - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+    #   - AWS_REGION=${AWS_REGION}
+    #   - S3_BUCKET_NAME=${S3_BUCKET_NAME}
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  app-network:
+    driver: bridge

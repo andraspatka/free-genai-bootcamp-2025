@@ -1,0 +1,12 @@
+streamlit>=1.30.0,<2.0.0
+atomic-agents>=0.3.0,<0.4.0
+pydantic>=2.0.0,<3.0.0
+sqlalchemy>=2.0.0,<3.0.0
+psycopg2-binary>=2.9.0,<3.0.0
+python-dotenv>=1.0.0,<2.0.0
+openai>=1.0.0,<2.0.0
+boto3>=1.30.0,<2.0.0
+requests>=2.30.0,<3.0.0
+beautifulsoup4>=4.12.0,<5.0.0
+youtube-transcript-api>=0.6.0,<0.7.0
+duckduckgo-search>=5.0.0,<6.0.0
