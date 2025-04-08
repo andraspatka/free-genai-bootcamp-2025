@@ -1,48 +1,16 @@
-from pydantic import BaseModel, Field
+from pydantic import Field
 from typing import Literal, Optional, List, Union
 from atomic_agents.schemas.base_schema import BaseIOSchema
 import uuid
 
+from .config import AgentConfig
+
 # --- Agent Input Schema ---
 class AgentInputSchema(BaseIOSchema):
     """Input schema for the Language Learning Exercise Agent."""
-    topic: str = Field(..., description="The central theme or subject for the learning exercise (e.g., 'Italian greetings', 'ordering food in French').")
+    topic: str = Field(..., description=f"The central theme or subject for the learning exercise (e.g., '{AgentConfig.target_language} greetings', 'ordering food in {AgentConfig.target_language}').")
     difficulty: Literal["easy", "medium", "hard"] = Field(..., description="The desired difficulty level for the exercise.")
-    target_language: str = Field(default="Italian", description="The language the user wants to learn.")
-    user_context: Optional[str] = Field(None, description="Optional context about the user or their learning goals (e.g., 'beginner student', 'traveling next month').")
-
-# --- Agent Intermediate & Tool Output Schemas (used within the agent flow) ---
-class ContentGenerationSchema(BaseIOSchema):
-    """Schema representing generated content like stories or dialogues."""
-    content_type: Literal["story", "dialogue", "transcript_summary"] = Field(..., description="Type of content generated.")
-    text: str = Field(..., description="The generated text content.")
-    topic: str = Field(..., description="The topic the content relates to.")
-    target_language: str = Field(..., description="The language of the content.")
-
-class MediaSchema(BaseIOSchema):
-    """Schema representing generated media (image or audio)."""
-    media_type: Literal["image", "audio"] = Field(..., description="Type of media generated.")
-    s3_path: str = Field(..., description="The S3 path where the media is stored.")
-    source_text_or_prompt: str = Field(..., description="The text or prompt used to generate the media.")
-
-class QuizSchema(BaseIOSchema):
-    """Schema representing a generated quiz question and its answer."""
-    question: str = Field(..., description="The quiz question.")
-    correct_answer: str = Field(..., description="The correct answer to the question.")
-    # We might add question_type later (e.g., multiple-choice, translation)
-
-class TranslationRequestSchema(BaseIOSchema):
-    """Schema for requesting a translation."""
-    text_to_translate: str = Field(..., description="The text needing translation.")
-    source_language: str = Field(..., description="The original language of the text.")
-    target_language: str = Field(..., description="The language to translate into.")
-
-class TranslationResponseSchema(BaseIOSchema):
-    """Schema for the result of a translation."""
-    original_text: str = Field(..., description="The original text provided.")
-    translated_text: str = Field(..., description="The translated text.")
-    source_language: str = Field(..., description="The original language.")
-    target_language: str = Field(..., description="The target language.")
+    target_language: str = Field(default=AgentConfig.target_language, description="The language the user wants to learn.")
 
 class UserInteractionSchema(BaseIOSchema):
     """Schema representing an interaction point requiring user input."""
@@ -70,20 +38,6 @@ class FinalOutputSchema(BaseIOSchema):
     # Include the original request for context
     original_topic: str
     original_target_language: str
-
-# --- Agent Memory/State Schema ---
-class AgentStateSchema(BaseIOSchema):
-    """Schema to hold the agent's state between steps or turns."""
-    current_step: str = Field(..., description="Identifier for the current stage of the exercise generation process.")
-    original_input: AgentInputSchema
-    generated_story_id: Optional[uuid.UUID] = None
-    generated_story_text: Optional[str] = None
-    generated_image_s3_path: Optional[str] = None
-    generated_audio_s3_path: Optional[str] = None
-    generated_quiz_ids: List[uuid.UUID] = Field(default_factory=list)
-    # Store intermediate results if needed for multi-step processes
-    intermediate_data: Optional[Dict[str, Any]] = None
-    last_interaction_id: Optional[uuid.UUID] = None # Track the ID needed for evaluation
 
 
 # --- Union Schema for Agent's Flexible Output ---

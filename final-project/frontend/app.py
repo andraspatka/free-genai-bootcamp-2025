@@ -1,11 +1,5 @@
 import streamlit as st
-import sys
-import os
 import logging
-
-# Add project root to Python path to allow importing backend modules
-project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.insert(0, project_root)
 
 from backend.agent import LanguageExerciseAgent
 from backend.schemas import AgentInputSchema, UserInteractionSchema, EvaluationSchema, FinalOutputSchema, AgentOutputSchema
