@@ -1,0 +1,24 @@
+services:
+  app:
+    build:
+      context: . # Build context is the project root
+      dockerfile: Dockerfile
+    container_name: language_exercise_app
+    ports:
+      - "${APP_PORT:-8501}:8501" # Expose Streamlit port, default 8501
+    volumes:
+      # Mount the source code for development (optional, remove for production)
+      # Allows code changes without rebuilding image
+      - ./:/app
+    restart: unless-stopped
+    env_file:
+      - .env
+    # Environment variables needed by the app
+    environment:
+      - OPENAI_API_KEY
+      - AWS_ACCESS_KEY_ID
+      - AWS_SECRET_ACCESS_KEY
+      - AWS_REGION
+      - S3_BUCKET_NAME
+    entrypoint: ['sleep', 'infinity']
+

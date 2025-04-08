@@ -22,7 +22,9 @@ RUN pip install --no-cache-dir --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the rest of the application code into the container
-COPY . .
+COPY backend backend
+COPY frontend frontend
+COPY tools tools
 
 # Make port 8501 available for Streamlit
 EXPOSE 8501
@@ -30,7 +32,7 @@ EXPOSE 8501
 # Set default command to run Streamlit
 # It will run the frontend app, which imports the backend
 # Healthcheck for Streamlit app
-HEALTHCHECK CMD curl --fail http://localhost:8501/_stcore/health || exit 1
+# HEALTHCHECK CMD curl --fail http://localhost:8501/_stcore/health || exit 1
 
 # Run the Streamlit app
 ENTRYPOINT ["streamlit", "run", "frontend/app.py", "--server.port=8501", "--server.address=0.0.0.0"]
