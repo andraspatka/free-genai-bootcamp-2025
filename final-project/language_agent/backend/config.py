@@ -16,6 +16,9 @@ class AgentConfig:
     """Configuration for the chat application"""
 
     api_key: str = get_env("OPENAI_API_KEY")
+    aws_access_key_id: str = get_env("AWS_ACCESS_KEY_ID")
+    aws_secret_access_key: str = get_env("AWS_SECRET_ACCESS_KEY")
+    aws_region: str = get_env("AWS_REGION")
     s3_bucket: str = get_env("S3_BUCKET_NAME")
     model: str = "gpt-4o-mini"
     target_language: str = "Italian"

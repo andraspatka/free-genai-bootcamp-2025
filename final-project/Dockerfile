@@ -26,6 +26,8 @@ COPY language_agent language_agent
 
 WORKDIR /app/language_agent
 
+ENV PYTHONPATH=$PYTHONPATH:/app
+
 # Make port 8501 available for Streamlit
 EXPOSE 8501
 
