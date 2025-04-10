@@ -15,7 +15,7 @@ def get_env(key: str) -> str:
 class AgentConfig:
     """Configuration for the chat application"""
 
-    api_key: str = get_env("OPENAI_API_KEY")  # This becomes a class variable
+    api_key: str = get_env("OPENAI_API_KEY")
     s3_bucket: str = get_env("S3_BUCKET_NAME")
     model: str = "gpt-4o-mini"
     target_language: str = "Italian"

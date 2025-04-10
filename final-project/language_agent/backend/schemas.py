@@ -14,17 +14,8 @@ class AgentInputSchema(BaseIOSchema):
 
 class UserInteractionSchema(BaseIOSchema):
     """Schema representing an interaction point requiring user input."""
-    interaction_type: Literal["ask_for_translation", "ask_for_description", "present_quiz"] = Field(..., description="The type of interaction requested.")
-    prompt_to_user: str = Field(..., description="The instruction or question presented to the user.")
+    response_to_user: str = Field(..., description="The instruction, question or feedback presented to the user.")
     media_s3_path: Optional[str] = Field(None, description="Optional S3 path for associated media (image/audio) for the interaction.")
-    # We might need a way to store context for evaluating the user's response later
-    interaction_id: uuid.UUID = Field(default_factory=uuid.uuid4, description="Unique ID for this interaction instance.")
-
-class EvaluationSchema(BaseIOSchema):
-    """Schema representing the evaluation of a user's response."""
-    evaluation_feedback: str = Field(..., description="Feedback provided to the user about their response.")
-    is_correct: Optional[bool] = Field(None, description="Whether the user's response was deemed correct (if applicable).")
-    interaction_id: uuid.UUID = Field(..., description="The ID of the interaction being evaluated.")
 
 # --- Agent Final Output Schema ---
 class FinalOutputSchema(BaseIOSchema):
@@ -33,7 +24,6 @@ class FinalOutputSchema(BaseIOSchema):
     difficulty: Literal["easy", "medium", "hard"]
     text_content: Optional[str] = Field(None, description="Main text content of the exercise, if any.")
     image_s3_path: Optional[str] = Field(None, description="S3 path to an associated image, if any.")
-    audio_s3_path: Optional[str] = Field(None, description="S3 path to associated audio, if any.")
     quiz_questions: Optional[List[QuizSchema]] = Field(None, description="List of quiz questions, if the exercise is a quiz.")
     # Include the original request for context
     original_topic: str
@@ -42,5 +32,5 @@ class FinalOutputSchema(BaseIOSchema):
 
 # --- Union Schema for Agent's Flexible Output ---
 # This tells the agent it can output *either* a request for user interaction *or* the final result.
-AgentOutputSchema = Union[UserInteractionSchema, EvaluationSchema, FinalOutputSchema]
+AgentOutputSchema = Union[UserInteractionSchema, FinalOutputSchema]
 

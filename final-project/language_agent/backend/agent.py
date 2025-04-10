@@ -3,17 +3,20 @@ import logging
 from typing import List, Type, Union, Optional
 
 from atomic_agents.agents.base_agent import BaseAgent
-from atomic_agents.schemas.chat_message import ChatMessage
-from atomic_agents.schemas.tool_call import ToolCall, ToolCallResponse
-from atomic_agents.systems.agent_system import AgentSystem
-from atomic_agents.clients.openai_client import OpenAIClient
 
 from .config import AgentConfig
 from .schemas import (
     AgentInputSchema, AgentOutputSchema, FinalOutputSchema,
     UserInteractionSchema
 )
-from ..tools.schemas import BaseToolInputSchema, BaseToolOutputSchema # For type hinting
+from language_agent.tools import (
+    DuckDuckGoSearchTool,
+    PageContentGetterTool,
+    ExtractVocabularyTool,
+    S3UploaderTool,
+    S3DownloaderTool,
+    ImageGeneratorTool
+)
 
 
 # Configure logging
@@ -27,24 +30,29 @@ class LanguageExerciseAgent(BaseAgent):
         super().__init__(
             client=instructor.from_openai(openai.OpenAI(api_key=AgentConfig.api_key)),
             model=AgentConfig.model,
+            tools=[
+                DuckDuckGoSearchTool(),
+                PageContentGetterTool(),
+                ExtractVocabularyTool(),
+            ],
             system_prompt_generator=SystemPromptGenerator(
                 background=[
                     "You are a language teacher specialized in creating interactive and engaging language learning exercises.",
                     "Your goal is to generate an engaging exercise based on the user's specified topic, difficulty, and target language."
-                ]
+                ],
                 steps=[
                     "Analyze the user's request (topic, difficulty, language, context).",
                     "Based on the difficulty, decide on an appropriate exercise type (e.g., translation, listening quiz, image description).",
-                    "If necessary, use the available tools to gather information (search, web scrape, YouTube) or generate content (story, image, audio).",
-                    "Store generated assets (audio, image) using the S3 tool (implicitly via TTS/TTI tools) and record information (stories, quizzes) in the database using the DB tools.",
+                    "If necessary, use the available tools to gather information (search, web scrape) or generate content (story, image).",
+                    "Store generated assets (image) using the S3 tool and record information (stories, quizzes) in the database using the DB tools.",
                     "Construct the exercise. This might involve:",
                     "    - Asking the user to perform a task (translate text, describe an image).",
                     "    - Presenting a quiz. If a quiz already exists for the given topic, then fetch the quiz details from the database using the DB tools.",
-                    "    - Simply providing generated content (story, audio) as the exercise..",
+                    "    - Simply providing generated content (story, image) as the exercise..",
                     "If the exercise requires user input, you will output a `UserInteractionSchema`. The system will handle getting the user's response.",
                     "If you receive user input (as part of the chat history), evaluate it using your language skills. Output the evaluation using `EvaluationSchema`.",
                     "Once the entire exercise flow is complete (content generated, presented, and potentially evaluated), output the final result using `FinalOutputSchema`.",
-                ]
+                ],
                 output_instructions=[
                     "Always use the specified target language for the exercise content.",
                     "Adhere strictly to the requested difficulty level.",
@@ -68,8 +76,6 @@ class LanguageExerciseAgent(BaseAgent):
         self.memory.current_turn_id = None
 
 
-
-# Example Usage (typically called from the frontend)
 if __name__ == '__main__':
     from rich.console import Console
     from rich.panel import Panel
@@ -93,27 +99,19 @@ if __name__ == '__main__':
     # 3. Run the agent for the first time
     response = agent.run(initial_request)
 
-    print("\n--- Agent Response 1 ---")
-    print(response.model_dump_json(indent=2))
+    response_msg = response.chat_message
 
-    # 4. Simulate conversation flow (if response requires interaction)
-    chat_history = agent.agent_system.memory.get_messages() # Get history from the first run
+    while True:
+        console.print(f"\n[bold]Agent: {response_msg}[/bold]")
+        try:
+            user_message = console.input("\n[bold blue]Your question:[/bold blue] ").strip()
 
-    if isinstance(response, UserInteractionSchema):
-        print("\n--- Simulating User Input --- stimulating")
-        user_reply_content = "Vorrei un caffè, per favore." # Example user response
-        user_message = ChatMessage(role="user", content=user_reply_content)
-
-        # 5. Run the agent again with the user's response
-        response_2 = agent.run(user_message, chat_history=chat_history)
-
-        print("\n--- Agent Response 2 (Evaluation/Next Step) ---")
-        print(response_2.model_dump_json(indent=2))
-
-        # Continue the loop as needed...
-
-    elif isinstance(response, FinalOutputSchema):
-        print("\n--- Exercise Generation Complete --- FinalOutputSchema")
-    else:
-        print("\n--- Unexpected initial response type ---Unexpected initial response type --- unexpected")
+            if user_message.lower() == "exit":
+                console.print("\n[bold]👋 Goodbye![/bold]")
+                break
+            response_msg = agent.run(user_message).chat_message
+        
+        except Exception as e:
+            console.print(f"\n[bold red]Error:[/bold red] {str(e)}")
+            console.print("[dim]Please try again or type 'exit' to quit.[/dim]")
 

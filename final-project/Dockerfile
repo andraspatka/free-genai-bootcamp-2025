@@ -22,9 +22,9 @@ RUN pip install --no-cache-dir --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the rest of the application code into the container
-COPY backend backend
-COPY frontend frontend
-COPY tools tools
+COPY language_agent language_agent
+
+WORKDIR /app/language_agent
 
 # Make port 8501 available for Streamlit
 EXPOSE 8501
