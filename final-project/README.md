@@ -191,3 +191,11 @@ graph TD
     Docker -- manages --> Agent
     Docker -- manages --> DB
 ```
+
+# Journaling
+
+- The initial scope for the agent was too large and it was difficult the accurately define what the agent should do. Some of the steps were simplified to make it easier to implement
+- For some reason the agent didn't want to use the tools that were provided to it. It preferred to hallucinate the outputs instead, so it conforms to the output schema. Forcing the schema to use a field that is the output of one of the agents did not help, as it still preferred to hallucinate instead of using the tool.
+- It's crucial to have the tools be small and to test them individually to make sure they are working, so the agent doesn't have issues if it tries to use them
+- I (preemptively) added some guardrails so the agent doesn't output the AWS secrets and OpenAI API keys. As the user can send the agent free text, this poses a potential security concern, as the user could input anything they want, and could potentially get the agent to divulge information that it shouldn't.
+- As I was making no progress in forcing the agent to use the tools, I turned to using multiple smaller agents. The task needs to be more specific, as otherwise the agent gets lost and starts hallucinating.
