@@ -11,7 +11,8 @@ logger = logging.getLogger(__name__)
 # INPUT SCHEMA(S)  #
 ####################
 class ImageGeneratorToolInputSchema(BaseModel):
-    """Schema for input to a tool for generating images using OpenAI's API.
+    """ 
+    Schema for input to a tool for generating images using OpenAI's API.
     Takes a text string detailing the image to be generated.
     """
     description: str = Field(

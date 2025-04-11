@@ -20,6 +20,8 @@ ENV PYTHONUNBUFFERED 1
 COPY requirements.txt .
 RUN pip install --no-cache-dir --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
+# Debug configs
+RUN pip install debugpy
 
 # Copy the rest of the application code into the container
 COPY language_agent language_agent

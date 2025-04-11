@@ -20,7 +20,7 @@ class AgentConfig:
     aws_secret_access_key: str = get_env("AWS_SECRET_ACCESS_KEY")
     aws_region: str = get_env("AWS_REGION")
     s3_bucket: str = get_env("S3_BUCKET_NAME")
-    model: str = "gpt-4o-mini"
+    model: str = "gpt-4o"
     target_language: str = "Italian"
 
     def __init__(self):
