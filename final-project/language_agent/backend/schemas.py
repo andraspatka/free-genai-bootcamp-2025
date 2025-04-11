@@ -2,6 +2,8 @@ from pydantic import Field
 from typing import Literal, Optional, List, Union
 from atomic_agents.agents.base_agent import BaseIOSchema
 
+from language_agent.tools.image_generator import ImageGeneratorToolOutputSchema
+
 from .config import AgentConfig
 
 # --- Agent Input Schema ---
@@ -28,7 +30,8 @@ class AgentOutputSchema(BaseIOSchema):
     difficulty: Literal["easy", "medium", "hard"]
     text_content: Optional[str] = Field(None, description="Main text content of the exercise, if any.")
     response_to_user: str = Field(..., description="The instruction, question or feedback presented to the user.")
-    image_s3_path: Optional[str] = Field(None, description="S3 path to an associated image, if any.")
+    image: ImageGeneratorToolOutputSchema = Field(..., description="Generated image. The output should come from the ImageGeneratorTool.")
+    # image_s3_path: Optional[str] = Field(None, description="Path in the S3 bucket where the generated image was stored, if any.")
     quiz_questions: Optional[List[QuizSchema]] = Field(None, description="List of quiz questions, if the exercise is a quiz.")
     # Include the original request for context
     original_topic: str

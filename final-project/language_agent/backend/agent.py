@@ -8,6 +8,7 @@ import instructor
 import openai
 
 from atomic_agents.lib.components.system_prompt_generator import SystemPromptGenerator
+from atomic_agents.lib.components.agent_memory import AgentMemory
 
 from language_agent.backend.config import AgentConfig
 from language_agent.backend.schemas import AgentInputSchema, AgentOutputSchema
@@ -60,6 +61,7 @@ class LanguageExerciseAgent(BaseAgent):
             BaseAgentConfig(
                 client=instructor.from_openai(openai.OpenAI(api_key=AgentConfig.api_key)),
                 model=AgentConfig.model,
+                memory=AgentMemory(),
                 tools=[
                     duckduckgo_search_tool,
                     page_content_getter_tool,
@@ -76,11 +78,11 @@ class LanguageExerciseAgent(BaseAgent):
                     steps=[
                         "Analyze the user's request (topic, difficulty, language, context).",
                         "Based on the difficulty, decide on an appropriate exercise type:",
-                        "- Easy exercises should include only text, examples: translation, role play",
-                        "- Medium exercises should include a generated image, example: image description. Use the image generator tool for this.",
-                        "- Hard exercises should include audio, example: listening comprehension of an italian dialogue with a quiz to test comprehension",
-                        "If necessary, use the available tools to gather information (search, web scrape) or generate content (story, image).",
-                        "Store generated assets (image, audio) using the S3 tool.",
+                        "- Easy exercises should include only text, examples: translation, role play, etc. Relevant tools for this are: ExtractVocabularyTool, PageContentGetterTool, DuckDuckGoSearchTool.",
+                        "- Medium exercises should include a generated image, example: describe this image. Relevant tools for this are: ImageGeneratorTool, S3UploaderTool.",
+                        "- Hard exercises should include audio, example: listening comprehension of an italian dialogue with a quiz to test comprehension. Relevant tools for this are: AudioGeneratorTool, S3UploaderTool.",
+                        "If necessary, use the available tools to gather information (DuckDuckGoSearchTool, PageContentGetterTool, ExtractVocabularyTool) or generate content (ImageGeneratorTool, AudioGeneratorTool).",
+                        "Store generated assets (image, audio) using the S3 tool (S3UploaderTool).",
                         "If the exercise requires user input, then ask for it.",
                     ],
                     output_instructions=[
