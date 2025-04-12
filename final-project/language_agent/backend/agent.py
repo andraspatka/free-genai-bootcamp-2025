@@ -85,10 +85,10 @@ class LanguageExerciseAgent(BaseAgent):
             return [
                 "The user has requested a medium exercise. This means that the exercise will include an image."
                 "Analyze the user's request (topic, language, context).",
-                "Example exercises could be: Image description - Provide a generated image to the user and ask them to describe it.",
-                "Generate only one image at the beginning.",
+                "Generate one image which is used for the exercise. The image should be generated once at the beginning of the conversation.",
                 "After that wait for the user to give their inputs.",
-                "Provide feedback based on the user's input to let them know if they are correct.",
+                "Provide feedback based on the user's input to let them know if they are correct. Don't generate any additional images after the original image was generated.",
+                "Example exercises could be: Image description - Provide a generated image to the user and ask them to describe it.",
             ]
         elif self.difficulty == "hard":
             return [
@@ -172,15 +172,8 @@ class LanguageExerciseAgent(BaseAgent):
 
 def main():
     from rich.console import Console
-    from rich.panel import Panel
-    from rich.markdown import Markdown
-    from rich.table import Table
-    from rich import box
-    from rich.progress import Progress, SpinnerColumn, TextColumn
 
     console = Console()
-
-    
     logger.info("Running agent example...")
 
     agent = LanguageExerciseAgent(difficulty="medium")
@@ -198,13 +191,11 @@ def main():
         try:
             user_message = console.input("\n[bold blue]Your question:[/bold blue] ").strip()
 
-            agent_input = AgentInputSchema(
+            request = AgentInputSchema(
                 user_input=user_message,
                 target_language=AgentConfig.target_language,
                 topic="",
             )
-
-            response = agent.run(agent_input)
 
             if user_message.lower() == "exit":
                 console.print("\n[bold]👋 Goodbye![/bold]")

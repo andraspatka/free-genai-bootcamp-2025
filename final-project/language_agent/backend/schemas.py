@@ -37,9 +37,7 @@ class AgentOutputSchema(BaseIOSchema):
     response_to_user: str = Field(..., description="The instruction, question or feedback presented to the user.")
     response_to_user_en: str = Field(..., description="The instruction, question or feedback presented to the user in English.")
     # Include the original request for context
-    original_topic: str
-    original_target_language: str
-    original_difficulty: Literal["easy", "medium", "hard"]
+    original_topic: str = Field(..., description="The original topic provided by the user.")
 
 
 class EasyExerciseAgentOutputSchema(AgentOutputSchema):
