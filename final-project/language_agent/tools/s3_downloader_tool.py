@@ -28,7 +28,7 @@ class S3DownloaderToolOutputSchema(BaseModel):
     """Output schema for the S3 Downloader tool."""
     success: bool = Field(..., description="Whether the download was successful")
     message: str = Field(..., description="Status message about the download")
-    image_base64: Optional[str] = Field(None, description="The base64 encoded image data")
+    file_base64: Optional[str] = Field(None, description="The base64 encoded file data")
 
 ##############
 # TOOL LOGIC #
@@ -119,12 +119,12 @@ class S3DownloaderTool:
                 
                 # Read the image file and encode it in base64
                 with open(local_path, "rb") as f:
-                    image_base64 = base64.b64encode(f.read()).decode('utf-8')
+                    file_base64 = base64.b64encode(f.read()).decode('utf-8')
             
             return S3DownloaderToolOutputSchema(
                 success=True,
                 message=f"File successfully downloaded to {local_path}",
-                image_base64=image_base64
+                file_base64=file_base64
             )
             
         except Exception as e:

@@ -2,7 +2,7 @@ from pydantic import Field
 from typing import Literal, Optional, List, Union
 from atomic_agents.agents.base_agent import BaseIOSchema
 
-from language_agent.tools.image_generator import ImageGeneratorToolInputSchema
+from language_agent.tools import ImageGeneratorToolInputSchema, AudioGeneratorToolInputSchema
 
 from .config import AgentConfig
 

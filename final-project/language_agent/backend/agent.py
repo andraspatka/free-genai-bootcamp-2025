@@ -177,8 +177,7 @@ class LanguageExerciseAgent(BaseAgent):
 
         return UIOutputSchema(
             **response.model_dump(),
-            audio_s3=s3_path,
-            quiz_questions=response.quiz_questions
+            audio_s3=s3_path
         )
 
 

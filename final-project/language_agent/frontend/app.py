@@ -1,3 +1,4 @@
+import base64
 import streamlit as st
 import logging
 
@@ -8,8 +9,7 @@ from language_agent.backend.schemas import AgentInputSchema, UIOutputSchema, Qui
 from language_agent.backend.config import AgentConfig # For default language
 from language_agent.frontend.session_state import initialize_session_state
 from language_agent.frontend.ui_components import display_quiz, header, footer, render_chat_messages
-from language_agent.frontend.util import base64_to_pil_image
-
+from language_agent.frontend.util import base64_to_pil_image, base64_to_audio
 from language_agent.tools import S3DownloaderTool, S3DownloaderToolConfig, S3DownloaderToolInputSchema
 
 # Configure logging
@@ -64,37 +64,29 @@ def main():
             st.subheader("Conversation")
             render_chat_messages()
 
+        latest_response = st.session_state.current_response
         with col_resources:
             st.subheader("Resources")
-            latest_response = st.session_state.current_response
+            
             if difficulty == "medium":
                 if st.session_state.image is None:
                     s3_path = latest_response.image_s3
-
-                    s3_dl_tool = S3DownloaderTool(
-                        S3DownloaderToolConfig(
-                            aws_access_key_id=AgentConfig.aws_access_key_id,
-                            aws_secret_access_key=AgentConfig.aws_secret_access_key,
-                            aws_region=AgentConfig.aws_region
-                        )
-                    )
-
-                    image_base64 = s3_dl_tool.run(S3DownloaderToolInputSchema(s3_path=s3_path)).image_base64
+                    image_base64 = st.session_state.s3_dl_tool.run(S3DownloaderToolInputSchema(s3_path=s3_path)).file_base64
                     st.session_state.image = base64_to_pil_image(image_base64)
                 
                 if st.session_state.image:
                     st.image(st.session_state.image, caption="🖼️ Generated Image", use_column_width=True)
-                    logger.info(f"Displaying image from: ")
                 else:
                     st.info("No image available for this exercise.")
 
             elif difficulty == "hard":
-                st.info("Hard difficulty resources (Audio/Quiz) display area.")
+                if st.session_state.audio is None:
+                    s3_path = latest_response.audio_s3
+                    audio_base64 = st.session_state.s3_dl_tool.run(S3DownloaderToolInputSchema(s3_path=s3_path)).file_base64
+                    st.session_state.audio = audio_base64
                 # Display Audio
-                audio_s3_to_display = latest_response.audio_s3 if hasattr(latest_response, 'audio_s3') and latest_response.audio_s3 else (initial_audio_msg['audio_s3'] if initial_audio_msg else None)
-                if audio_s3_to_display:
-                    st.audio(audio_s3_to_display)
-                    logger.info(f"Displaying audio from: {audio_s3_to_display}")
+                if st.session_state.audio:
+                    st.audio(base64_to_audio(st.session_state.audio))
 
                 # Display Quiz
                 quiz_to_display = latest_response.quiz_questions if hasattr(latest_response, 'quiz_questions') and latest_response.quiz_questions else (initial_quiz_msg['quiz'] if initial_quiz_msg else None)

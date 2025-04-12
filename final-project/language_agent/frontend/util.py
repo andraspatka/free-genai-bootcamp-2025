@@ -32,22 +32,27 @@ def base64_to_pil_image(base64_str):
         logger.error(f"Error converting base64 to PIL image: {e}")
         return None
 
-def pil_image_to_base64(image, format="PNG"):
+
+def base64_to_audio(base64_str):
     """
-    Convert a Pillow Image object to a base64 encoded string.
+    Convert a base64 encoded audio string to binary data for use with st.audio.
     
     Args:
-        image (PIL.Image.Image): Pillow Image object
-        format (str): Image format for saving (default: PNG)
-        
+        base64_str (str): Base64 encoded audio string
+                         
     Returns:
-        str: Base64 encoded image string
+        bytes: Binary audio data
     """
     try:
-        buffer = BytesIO()
-        image.save(buffer, format=format)
-        img_str = base64.b64encode(buffer.getvalue()).decode('utf-8')
-        return img_str
+        # Strip header if present (e.g., "data:audio/mp3;base64,")
+        if "base64," in base64_str:
+            base64_str = base64_str.split("base64,")[1]
+        
+        # Decode base64 string to bytes
+        audio_bytes = base64.b64decode(base64_str)
+        
+        return audio_bytes
     except Exception as e:
-        logger.error(f"Error converting PIL image to base64: {e}")
+        logger.error(f"Error converting base64 to audio: {e}")
         return None
+
