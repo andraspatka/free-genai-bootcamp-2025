@@ -84,15 +84,15 @@ def main():
                     s3_path = latest_response.audio_s3
                     audio_base64 = st.session_state.s3_dl_tool.run(S3DownloaderToolInputSchema(s3_path=s3_path)).file_base64
                     st.session_state.audio = audio_base64
-                # Display Audio
-                if st.session_state.audio:
-                    st.audio(base64_to_audio(st.session_state.audio))
+                
+                st.audio(base64_to_audio(st.session_state.audio))
 
                 # Display Quiz
                 if st.session_state.quiz is None:
                     st.session_state.quiz = latest_response.quiz
-                    logger.info("Displaying quiz.")
-                    display_quiz()
+                    
+                logger.info("Displaying quiz.")
+                display_quiz()
 
 
     # --- Handle User Input Submission ---
