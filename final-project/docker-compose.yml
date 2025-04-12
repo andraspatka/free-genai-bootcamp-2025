@@ -23,6 +23,7 @@ services:
       AWS_REGION:
       S3_BUCKET_NAME:
       DEBUG: True
+    # watchfiles + code is mounted via volume - makes sure that code changes automatically restart the streamlit server
     entrypoint: ["watchfiles", "streamlit run /app/language_agent/frontend/app.py --server.port=8501 --server.address=0.0.0.0", "/app/language_agent"]
     # entrypoint: ["streamlit", "run", "/app/language_agent/frontend/app.py", "--server.port=8501", "--server.address=0.0.0.0"]
 
