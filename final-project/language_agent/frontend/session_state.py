@@ -37,3 +37,9 @@ def initialize_session_state():
                 aws_region=AgentConfig.aws_region
             )
         )
+    if 'quiz' not in st.session_state:
+        st.session_state.quiz = None
+        logger.info("Session state: 'quiz' initialized to None.")
+    if 'quiz_selection' not in st.session_state:
+        st.session_state.quiz_selection = None
+        logger.info("Session state: 'quiz_selection' initialized to None.")

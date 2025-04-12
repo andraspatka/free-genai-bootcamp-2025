@@ -89,12 +89,10 @@ def main():
                     st.audio(base64_to_audio(st.session_state.audio))
 
                 # Display Quiz
-                quiz_to_display = latest_response.quiz_questions if hasattr(latest_response, 'quiz_questions') and latest_response.quiz_questions else (initial_quiz_msg['quiz'] if initial_quiz_msg else None)
-                if quiz_to_display:
+                if st.session_state.quiz is None:
+                    st.session_state.quiz = latest_response.quiz
                     logger.info("Displaying quiz.")
-                    display_quiz(quiz_to_display)
-                elif not audio_s3_to_display: # Only show 'no resources' if neither audio nor quiz is present
-                    st.info("No audio or quiz available for this exercise.")
+                    display_quiz()
 
 
     # --- Handle User Input Submission ---

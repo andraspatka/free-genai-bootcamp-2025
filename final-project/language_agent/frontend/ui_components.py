@@ -12,30 +12,45 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def display_quiz(quiz_questions: list[QuizSchema]):
+
+
+def display_quiz():
     """Displays quiz questions and options."""
-    if not quiz_questions:
+    if not st.session_state.quiz:
+        logger.error("No quiz available for this exercise.")
         return
-    for i, quiz in enumerate(quiz_questions):
-        st.subheader(f"Question {i+1}")
-        st.write(quiz.question)
-        if quiz.options:
-            options = [opt.option for opt in quiz.options]
-            # Using radio buttons for single choice - unique key needed
-            selected_option = st.radio(
-                f"Options for Question {i+1}",
-                options,
-                key=f"quiz_{st.session_state.current_response.response_to_user}_{i}" # Key based on response + index
+
+    if st.session_state.quiz:
+        st.text(st.session_state.quiz[0].question)
+        options = [q.option for q in st.session_state.quiz[0].options]
+        selected = st.radio("Choose your answer:", options, key="interactive_exercise_question")
+        st.session_state.quiz_selection = selected
+
+    if st.button("Check"): 
+        st.subheader("Feedback")
+        if st.session_state.quiz_selection:
+            feedback = [
+                q.feedback
+                for q in st.session_state.quiz[0].options 
+                if q.option == st.session_state.quiz_selection
+            ][0]
+            correct_answer = [
+                q.option
+                for q in st.session_state.quiz[0].options 
+                if q.is_correct
+            ][0]
+            is_correct = st.session_state.quiz_selection == correct_answer
+            st.text_area(
+                label="Feedback",
+                value=f"""
+                    Your choice is {st.session_state.quiz_selection}, it's {'correct' if is_correct else 'unfortunately wrong'}
+                    Correct answer: {correct_answer}
+                    Feedback: {feedback}
+                """,
+                height=400,
+                disabled=True
             )
-            # Simple display of options - feedback logic could be added if backend provides evaluation
-            # chosen_option_schema = next((opt for opt in quiz.options if opt.option == selected_option), None)
-            # if chosen_option_schema:
-            #     if chosen_option_schema.is_correct:
-            #         st.success(f"Feedback: {chosen_option_schema.feedback}")
-            #     else:
-            #         st.warning(f"Feedback: {chosen_option_schema.feedback}")
-        else:
-            st.text_input("Your answer:", key=f"quiz_answer_{i}") # Open-ended question
+
 
 def header():
     with st.container(border=True):
