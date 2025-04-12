@@ -53,7 +53,7 @@ class MediumExerciseAgentOutputSchema(AgentOutputSchema):
     Output schema for medium difficulty level. Assumes an image based exercise.
     """
     difficulty: Literal["medium"]
-    image_generator_tool_input: Optional[ImageGeneratorToolInputSchema] = Field(None, description="Input to the ImageGeneratorTool. A short description describing how to generate the image. The image should be generated once at the beginning only.")
+    image_generator_tool_input: Optional[ImageGeneratorToolInputSchema] = Field(None, description="Input to the ImageGeneratorTool. A short description describing how to generate the image. The image should be generated once at the beginning only. Always specify that image should be generated in Ghibli style.")
 
 
 class HardExerciseAgentOutputSchema(AgentOutputSchema):
