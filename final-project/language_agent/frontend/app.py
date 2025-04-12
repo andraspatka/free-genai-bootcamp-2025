@@ -1,186 +1,133 @@
 import streamlit as st
 import logging
 
-from backend.agent import LanguageExerciseAgent
-from backend.schemas import AgentInputSchema, UserInteractionSchema, EvaluationSchema, FinalOutputSchema, AgentOutputSchema
-from atomic_agents.schemas.chat_message import ChatMessage
+import os
+
+from language_agent.backend.agent import LanguageExerciseAgent
+from language_agent.backend.schemas import AgentInputSchema, UIOutputSchema, QuizSchema, QuizOptionSchema
+from language_agent.backend.config import AgentConfig # For default language
+from language_agent.frontend.session_state import initialize_session_state
+from language_agent.frontend.ui_components import display_quiz, header, footer, render_chat_messages
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-st.set_page_config(page_title="Language Learning Exercise Generator", layout="wide")
+def debug():
+    import debugpy
 
-st.title("💬 Language Learning Exercise Generator")
-st.caption("🚀 An AI agent to create custom language exercises")
+    # Enable debugger
+    debugpy.listen(("0.0.0.0", 5678))
+    logger.info("⏳ Waiting for debugger to attach at 0.0.0.0:5678...")
+    debugpy.wait_for_client()
+    logger.info("🔍 Debugger attached! Starting application...")
 
-# Initialize Agent (consider caching for efficiency)
-@st.cache_resource
-def get_agent():
-    logger.info("Initializing LanguageExerciseAgent for Streamlit session.")
-    return LanguageExerciseAgent()
+if os.getenv("DEBUG"):
+    if 'debug' not in st.session_state:
+        st.session_state.debug = True
+        debug()
 
-agent = get_agent()
+# --- Initialize Session State --- Must be called early
+initialize_session_state()
 
-# Initialize session state variables
-if 'messages' not in st.session_state:
-    st.session_state.messages = [] # Stores ChatMessage history for the agent
-if 'current_exercise_state' not in st.session_state:
-    # Stores the agent's output (UserInteraction, Evaluation, or Final)
-    st.session_state.current_exercise_state = None
-if 'exercise_in_progress' not in st.session_state:
-    st.session_state.exercise_in_progress = False
-if 'last_interaction_prompt' not in st.session_state:
-    st.session_state.last_interaction_prompt = None
-if 'last_media_path' not in st.session_state:
-     st.session_state.last_media_path = None
+def main():
+    # --- UI Layout ---
+    st.set_page_config(layout="wide", page_title="LinguaLearn AI")
+    st.title("🇮🇹 LinguaLearn AI Tutor 🇮🇹")
 
-# --- Sidebar for New Exercise Configuration ---
-st.sidebar.header("New Exercise Settings")
-with st.sidebar.form("exercise_form", clear_on_submit=False):
-    topic = st.text_input("Topic/Theme:", value="Greetings", help="E.g., 'Ordering food', 'Talking about hobbies'")
-    difficulty = st.selectbox("Difficulty:", ["easy", "medium", "hard"], index=0)
-    target_language = st.text_input("Target Language:", value="Italian")
-    user_context = st.text_area("Optional User Context:", height=100, placeholder="E.g., beginner, needs practice with past tense")
-    submitted = st.form_submit_button("Generate Exercise")
+    # --- Header Panel ---
+    header()
 
-    if submitted and topic and difficulty and target_language:
-        with st.spinner("Generating exercise..."):
-            logger.info(f"New exercise request submitted: Topic={topic}, Difficulty={difficulty}, Lang={target_language}")
-            st.session_state.messages = [] # Reset history for new exercise
-            st.session_state.exercise_in_progress = True
-            st.session_state.last_interaction_prompt = None
-            st.session_state.last_media_path = None
-            initial_input = AgentInputSchema(
-                topic=topic,
-                difficulty=difficulty,
-                target_language=target_language,
-                user_context=user_context or None
-            )
-            try:
-                response = agent.run(input_data=initial_input)
-                st.session_state.current_exercise_state = response
-                # Add initial agent output to messages for display
-                st.session_state.messages = agent.agent_system.memory.get_messages()
-                logger.info(f"Initial agent response type: {type(response).__name__}")
-                st.rerun() # Rerun to display the new state
-            except Exception as e:
-                logger.error(f"Error during initial agent run: {e}", exc_info=True)
-                st.error(f"An error occurred: {e}")
-                st.session_state.exercise_in_progress = False
+    # --- Main Content Area ---
+    if st.session_state.exercise_started and st.session_state.current_response:
+        st.divider()
+        difficulty = st.session_state.difficulty
+        logger.info(f"Displaying content for difficulty: {difficulty}")
 
-# --- Main Chat/Exercise Display Area ---
-col1, col2 = st.columns([2, 1]) # Main area and media area
+        # --- Chat Input (Common) ---
+        # Place chat input outside the columns to ensure it's always visible when exercise is active
+        user_input_value = st.chat_input("Your response:", key=f"chat_input_{st.session_state.input_key}")
 
-with col1:
-    st.subheader("Exercise Flow")
-    # Display previous messages (excluding initial system prompt if desired)
-    for msg in st.session_state.messages:
-        if msg.role == "system": continue # Don't usually show system prompt
-        with st.chat_message(msg.role):
-            st.markdown(msg.content)
-            # Display tool calls/responses if present
-            if msg.tool_calls:
-                with st.expander("Tool Calls"):
-                     for tc in msg.tool_calls:
-                         st.code(f"{tc.tool_name}({tc.arguments})", language="json")
-            if msg.tool_call_responses:
-                 with st.expander("Tool Responses"):
-                    for tr in msg.tool_call_responses:
-                         st.code(tr.content, language="json")
+        # --- Populate Placeholders based on difficulty ---
+        if difficulty == "easy":
+            st.subheader("Conversation")
+            render_chat_messages()
 
-    # Display current state based on agent output
-    current_state = st.session_state.current_exercise_state
-    if current_state:
-        with st.chat_message("assistant"):
-            if isinstance(current_state, UserInteractionSchema):
-                st.markdown(current_state.prompt_to_user)
-                st.session_state.last_interaction_prompt = current_state.prompt_to_user
-                st.session_state.last_media_path = current_state.media_s3_path
-                # Input area handled below
+        elif difficulty in ["medium", "hard"]:
+            col_chat, col_resources = chat_placeholder.columns(2)
 
-            elif isinstance(current_state, EvaluationSchema):
-                st.markdown("**Feedback:**")
-                st.markdown(current_state.evaluation_feedback)
-                if current_state.is_correct is not None:
-                    st.markdown(f"**Correct:** {current_state.is_correct}")
-                # Exercise might continue or end here based on agent logic
-                # For simplicity, assume exercise ends after evaluation for now
-                st.session_state.exercise_in_progress = False
-                st.info("Exercise evaluation complete.")
+            with col_chat:
+                st.subheader("Conversation")
+                render_chat_messages()
 
-            elif isinstance(current_state, FinalOutputSchema):
-                st.markdown(f"**Exercise Complete: {current_state.exercise_type} ({current_state.difficulty})**")
-                if current_state.text_content:
-                    st.markdown("**Content:**")
-                    st.markdown(current_state.text_content)
-                if current_state.quiz_questions:
-                    st.markdown("**Quiz:**")
-                    for i, q in enumerate(current_state.quiz_questions):
-                        st.markdown(f"{i+1}. {q.question}")
-                        with st.expander("Show Answer"):
-                            st.markdown(q.correct_answer)
-                st.session_state.last_media_path = current_state.image_s3_path or current_state.audio_s3_path
-                st.session_state.exercise_in_progress = False
-                st.success("Exercise generated successfully!")
+            with col_resources:
+                st.subheader("Resources")
+                latest_response = st.session_state.current_response
+                # Find the first message with the resource if latest doesn't have it (e.g., image only shown once)
+                initial_image_msg = next((msg for msg in st.session_state.messages if msg["role"] == "assistant" and msg.get("image_s3")), None)
+                initial_audio_msg = next((msg for msg in st.session_state.messages if msg["role"] == "assistant" and msg.get("audio_s3")), None)
+                initial_quiz_msg = next((msg for msg in st.session_state.messages if msg["role"] == "assistant" and msg.get("quiz")), None)
+
+
+                if difficulty == "medium":
+                    image_s3_to_display = latest_response.image_s3 if hasattr(latest_response, 'image_s3') and latest_response.image_s3 else (initial_image_msg['image_s3'] if initial_image_msg else None)
+                    if image_s3_to_display:
+                        st.image(image_s3_to_display, caption="🖼️ Generated Image", use_column_width=True)
+                        logger.info(f"Displaying image from: {image_s3_to_display}")
+                    else:
+                        st.info("No image available for this exercise.")
+
+                elif difficulty == "hard":
+                    st.info("Hard difficulty resources (Audio/Quiz) display area.")
+                    # Display Audio
+                    audio_s3_to_display = latest_response.audio_s3 if hasattr(latest_response, 'audio_s3') and latest_response.audio_s3 else (initial_audio_msg['audio_s3'] if initial_audio_msg else None)
+                    if audio_s3_to_display:
+                        st.audio(audio_s3_to_display)
+                        logger.info(f"Displaying audio from: {audio_s3_to_display}")
+
+                    # Display Quiz
+                    quiz_to_display = latest_response.quiz_questions if hasattr(latest_response, 'quiz_questions') and latest_response.quiz_questions else (initial_quiz_msg['quiz'] if initial_quiz_msg else None)
+                    if quiz_to_display:
+                        logger.info("Displaying quiz.")
+                        display_quiz(quiz_to_display)
+                    elif not audio_s3_to_display: # Only show 'no resources' if neither audio nor quiz is present
+                        st.info("No audio or quiz available for this exercise.")
+
+
+        # --- Handle User Input Submission ---
+        if user_input_value:
+            logger.info(f"User input received: {user_input_value}")
+            # Add user message to chat history IMMEDIATELY for better UX
+            st.session_state.messages.append({"role": "user", "content": user_input_value})
+
+            # Send user input to agent
+            if st.session_state.agent:
+                follow_up_request = AgentInputSchema(
+                    topic=st.session_state.topic, # Maintain topic context
+                    target_language=AgentConfig.target_language,
+                    user_input=user_input_value
+                )
+                logger.info(f"Running agent with follow-up request: {follow_up_request.model_dump()}")
+                try:
+                    with st.spinner("Agent thinking..."):
+                        response: UIOutputSchema = st.session_state.agent.run(follow_up_request)
+                        st.session_state.current_response = response
+                        logger.info(f"Agent follow-up response received: {response.model_dump(exclude={'image_s3', 'audio_s3'})}")
+                        # Add agent response to messages
+                    st.session_state.input_key += 1 # Increment key to clear input field
+                    st.rerun() # Update UI with new messages and potentially updated resources
+                except Exception as e:
+                    logger.error(f"Error running agent follow-up: {e}", exc_info=True)
+                    st.error(f"Error running agent: {e}")
             else:
-                # Handle unexpected state
-                st.error("An unexpected state was reached.")
-                st.code(str(current_state), language="text")
-                st.session_state.exercise_in_progress = False
-
-# --- Media Display Area ---
-with col2:
-    st.subheader("Media")
-    media_path = st.session_state.last_media_path
-    if media_path:
-        st.markdown(f"*Media Path: `{media_path}`* ")
-        # Naive check for image/audio based on common extensions or prefixes
-        # WARNING: This is basic. A robust solution needs proper S3 integration/URL signing
-        #          or direct fetching based on the path.
-        #          For now, it assumes the S3 path might be a public URL or recognizable pattern.
-        if media_path.startswith("s3://") or "://" not in media_path:
-             st.warning(f"Cannot directly display S3 path: {media_path}. Need pre-signed URL or public access.")
-             # TODO: Add logic here to generate pre-signed URL if possible
-        elif any(ext in media_path.lower() for ext in [".png", ".jpg", ".jpeg", ".gif", ".webp"]):
-            st.image(media_path, caption="Exercise Image")
-        elif any(ext in media_path.lower() for ext in [".mp3", ".wav", ".ogg", ".m4a"]):
-            st.audio(media_path, format='audio/mpeg') # Adjust format if needed
-        else:
-            st.info("Media link provided, but type is undetermined for display.")
-            st.markdown(f"[Link to Media]({media_path})")
+                st.error("Agent not initialized. Please generate an exercise first.")
+    elif st.session_state.exercise_started and not st.session_state.current_response:
+        st.info("Generating initial exercise...") # Handles the case where the first run is in progress
     else:
-        st.info("No media associated with the current step.")
+        st.info("Select difficulty and enter a topic to start generating an exercise.")
 
-# --- Chat Input Area ---
-# Only show input if the agent asked a question (UserInteractionSchema)
-if st.session_state.exercise_in_progress and isinstance(st.session_state.current_exercise_state, UserInteractionSchema):
-    prompt = st.session_state.last_interaction_prompt or "Your response:"
-    user_input = st.chat_input(prompt)
+    # --- Footer/Reset Button ---
+    footer()
 
-    if user_input:
-        logger.info(f"User submitted input: {user_input[:100]}...")
-        # Display user message immediately
-        with col1:
-             with st.chat_message("user"):
-                st.markdown(user_input)
-
-        # Send to agent
-        with st.spinner("Agent is thinking..."):
-            user_message = ChatMessage(role="user", content=user_input)
-            st.session_state.messages.append(user_message) # Add user message to stored history
-            try:
-                # Pass the updated history to the agent
-                response = agent.run(input_data=user_message, chat_history=st.session_state.messages)
-                st.session_state.current_exercise_state = response
-                # Update message history from agent's memory AFTER the run
-                st.session_state.messages = agent.agent_system.memory.get_messages()
-                logger.info(f"Agent response type after user input: {type(response).__name__}")
-                st.rerun()
-            except Exception as e:
-                logger.error(f"Error during agent run after user input: {e}", exc_info=True)
-                st.error(f"An error occurred: {e}")
-                st.session_state.exercise_in_progress = False
-elif not st.session_state.exercise_in_progress:
-     st.info("Generate a new exercise using the sidebar settings or review the completed one.")
-
+if __name__ == "__main__":
+    main()
