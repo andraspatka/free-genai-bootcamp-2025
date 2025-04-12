@@ -27,7 +27,11 @@ from language_agent.tools import (
     S3DownloaderTool,
     S3DownloaderToolConfig,
     ImageGeneratorTool,
-    ImageGeneratorToolConfig
+    ImageGeneratorToolConfig,
+    AudioGeneratorTool,
+    AudioGeneratorToolConfig,
+    AudioGeneratorToolInputSchema,
+    AudioGeneratorToolOutputSchema
 )
 
 
@@ -60,6 +64,13 @@ class LanguageExerciseAgent(BaseAgent):
     image_generator_tool = ImageGeneratorTool(
         ImageGeneratorToolConfig(
             openai_api_key=AgentConfig.api_key
+        )
+    )
+    audio_generator_tool = AudioGeneratorTool(
+        AudioGeneratorToolConfig(
+            aws_access_key_id=AgentConfig.aws_access_key_id,
+            aws_secret_access_key=AgentConfig.aws_secret_access_key,
+            aws_region=AgentConfig.aws_region
         )
     )
 
@@ -95,8 +106,6 @@ class LanguageExerciseAgent(BaseAgent):
                 "Example exercises could be: Listening comprehension - Provide an audio clip and give the user a quiz based on the content.",
                 "Provide feedback to the user about how they are doing.",
                 "If the exercise requires user input, then ask for it.",
-                "You can use the available tools to get more context for the exercise. E.g. search on the web for common dialogs based on the topic.",
-                "The audio should be generated out with the AudioGeneratorTool."
             ]
 
     def __init__(self, difficulty: str):
@@ -149,6 +158,30 @@ class LanguageExerciseAgent(BaseAgent):
         )
     
 
+    def _handle_hard_exercise(self, response: HardExerciseAgentOutputSchema) -> UIOutputSchema:
+        print("The response is of type HardExerciseAgentOutputSchema.")
+        s3_path = None
+        if response.audio_generator_tool_input:
+            generated_audio = self.audio_generator_tool.run(response.audio_generator_tool_input)
+
+            if generated_audio:
+                s3_result = self.s3_uploader_tool.run(
+                    S3UploaderToolInputSchema(
+                        base64_content=generated_audio.audio_base64,
+                        filename=generated_audio.filename
+                    )
+                )
+                s3_path = s3_result.s3_path
+                with open(f"/data/{generated_audio.filename}", "wb") as f:
+                    f.write(base64.b64decode(generated_audio.audio_base64))
+
+        return UIOutputSchema(
+            **response.model_dump(),
+            audio_s3=s3_path,
+            quiz_questions=response.quiz_questions
+        )
+
+
     def run(self, input: AgentInputSchema) -> UIOutputSchema:
         response = super().run(input)
         
@@ -160,7 +193,7 @@ class LanguageExerciseAgent(BaseAgent):
         elif isinstance(response, MediumExerciseAgentOutputSchema):
             return self._handle_medium_exercise(response)
         elif isinstance(response, HardExerciseAgentOutputSchema):
-            print("The response is of type HardExerciseAgentOutputSchema.")
+            return self._handle_hard_exercise(response)
         else:
             print("The response type is unknown.")
             raise ValueError("Unknown response type.")

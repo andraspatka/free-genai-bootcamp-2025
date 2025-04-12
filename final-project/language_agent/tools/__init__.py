@@ -4,6 +4,7 @@ from .s3_uploader_tool import S3UploaderTool, S3UploaderToolConfig, S3UploaderTo
 from .s3_downloader_tool import S3DownloaderTool, S3DownloaderToolConfig, S3DownloaderToolInputSchema
 from .image_generator import ImageGeneratorTool, ImageGeneratorToolConfig
 from .extract_vocabulary import ExtractVocabularyTool
+from .audio_generator import AudioGeneratorTool, AudioGeneratorToolConfig, AudioGeneratorToolInputSchema, AudioGeneratorToolOutputSchema
 
 __all__ = [
     "DuckDuckGoSearchTool",
@@ -17,4 +18,8 @@ __all__ = [
     "S3DownloaderToolConfig",
     "S3DownloaderToolInputSchema",
     "ImageGeneratorToolConfig",
+    "AudioGeneratorToolConfig",
+    "AudioGeneratorToolInputSchema",
+    "AudioGeneratorToolOutputSchema",
+    "AudioGeneratorTool"
 ]
