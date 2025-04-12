@@ -16,10 +16,10 @@ from language_agent.backend.agent import LanguageExerciseAgent
 
 import logging
 
+import json
+
 
 logger = logging.getLogger(__name__)
-
-
 
 
 def display_quiz():
@@ -29,8 +29,8 @@ def display_quiz():
         return
 
     if st.session_state.quiz:
-        st.text(st.session_state.quiz[0].question)
-        options = [q.option for q in st.session_state.quiz[0].options]
+        st.text(st.session_state.quiz[st.session_state.current_quiz_question].question)
+        options = [q.option for q in st.session_state.quiz[st.session_state.current_quiz_question].options]
         selected = st.radio("Choose your answer:", options, key="interactive_exercise_question")
         st.session_state.quiz_selection = selected
 
@@ -39,25 +39,42 @@ def display_quiz():
         if st.session_state.quiz_selection:
             feedback = [
                 q.feedback
-                for q in st.session_state.quiz[0].options 
+                for q in st.session_state.quiz[st.session_state.current_quiz_question].options 
                 if q.option == st.session_state.quiz_selection
             ][0]
             correct_answer = [
                 q.option
-                for q in st.session_state.quiz[0].options 
+                for q in st.session_state.quiz[st.session_state.current_quiz_question].options 
                 if q.is_correct
             ][0]
             is_correct = st.session_state.quiz_selection == correct_answer
+            if is_correct:
+                st.session_state.quiz_correct_count += 1
             st.text_area(
                 label="Feedback",
                 value=f"""
-                    Your choice is {st.session_state.quiz_selection}, it's {'correct' if is_correct else 'unfortunately wrong'}
-                    Correct answer: {correct_answer}
-                    Feedback: {feedback}
+Your choice is \"{st.session_state.quiz_selection}\" and it's {'correct!' if is_correct else 'unfortunately wrong 😔'}
+Correct answer: {correct_answer}
+Feedback: {feedback}
                 """,
-                height=400,
+                height=100,
                 disabled=True
             )
+        if st.session_state.current_quiz_question == len(st.session_state.quiz) - 1:
+            st.text_area(
+                label="Final Feedback",
+                value=f"""
+                    Final score is correct: **{st.session_state.quiz_correct_count}** out of total: **{len(st.session_state.quiz)}**
+                """,
+                height=200,
+                disabled=True
+            )    
+    if st.session_state.current_quiz_question < len(st.session_state.quiz) - 1:
+        if st.button("Next Question"):
+            st.session_state.current_quiz_question += 1
+            st.session_state.quiz_selection = None
+            st.rerun()
+        
 
 
 def header():
@@ -148,7 +165,7 @@ def main_content():
                     st.session_state.image = base64_to_pil_image(image_base64)
                 
                 if st.session_state.image:
-                    st.image(st.session_state.image, caption="🖼️ Generated Image", use_column_width=True)
+                    st.image(st.session_state.image, caption="🖼️ Generated Image", use_container_width=True)
                 else:
                     st.info("No image available for this exercise.")
 
@@ -200,7 +217,15 @@ def render_chat_messages():
         # Display chat messages
         for message in st.session_state.agent.get_message_history():
             with st.chat_message(message["role"], avatar="🧑‍💻" if message["role"] == "user" else "🤖"):
-                st.markdown(message["content"])
+                json_content = json.loads(message["content"])
+                message_content = ""
+                if "response_to_user" in json_content and json_content["response_to_user"]:
+                    message_content = json_content["response_to_user"]
+                if "topic" in json_content and json_content["topic"]:
+                    message_content += f"\ntopic: {json_content["topic"]}"
+                if "user_input" in json_content and json_content["user_input"]:
+                    message_content += f"\nuser_input: {json_content["user_input"]}"
+                st.markdown(message_content)
     else:
         st.markdown("No agent in state")
 
@@ -213,7 +238,10 @@ def footer():
             # Reset state variables
             st.session_state.agent = None
             st.session_state.difficulty = "easy" # Reset to default
-        st.session_state.topic = ""
-        st.session_state.messages = []
-        st.session_state.current_response = None
-        st.session_state.exercise_started = False
+            st.session_state.topic = ""
+            st.session_state.image = None
+            st.session_state.audio = None
+            st.session_state.quiz = None
+            st.session_state.current_response = None
+            st.session_state.exercise_started = False
+            st.rerun()

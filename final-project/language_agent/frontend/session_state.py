@@ -43,3 +43,9 @@ def initialize_session_state():
     if 'quiz_selection' not in st.session_state:
         st.session_state.quiz_selection = None
         logger.info("Session state: 'quiz_selection' initialized to None.")
+    if 'current_quiz_question' not in st.session_state:
+        st.session_state.current_quiz_question = 0
+        logger.info("Session state: 'current_quiz_question' initialized to None.")
+    if 'quiz_correct_count' not in st.session_state:
+        st.session_state.quiz_correct_count = 0
+        logger.info("Session state: 'quiz_correct_count' initialized to None.")

@@ -3,6 +3,8 @@ import logging
 from language_agent.frontend.session_state import initialize_session_state
 from language_agent.frontend.ui_components import header, footer, main_content
 
+import os
+
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
