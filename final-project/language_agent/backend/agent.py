@@ -31,8 +31,6 @@ from language_agent.tools import (
 )
 
 
-
-
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
@@ -157,8 +155,7 @@ class LanguageExerciseAgent(BaseAgent):
         if isinstance(response, EasyExerciseAgentOutputSchema):
             print("The response is of type EasyExerciseAgentOutputSchema.")
             return UIOutputSchema(
-                **response.model_dump(),
-                text_content = response.text_content,
+                **response.model_dump()
             )
         elif isinstance(response, MediumExerciseAgentOutputSchema):
             return self._handle_medium_exercise(response)
@@ -172,6 +169,10 @@ class LanguageExerciseAgent(BaseAgent):
     def clear_memory(self):
         self.memory.history = []
         self.memory.current_turn_id = None
+
+
+    def get_message_history(self):
+        return self.memory.get_history()
 
 
 def main():
