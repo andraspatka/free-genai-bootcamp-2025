@@ -68,7 +68,6 @@ def header():
                     st.session_state.topic = input_topic
                     st.session_state.current_response = None
                     st.session_state.exercise_started = True
-                    st.session_state.input_key += 1 # Reset chat input state
 
                     logger.info(f"Starting exercise generation. Difficulty: {selected_difficulty}, Topic: {input_topic}")
 
@@ -86,18 +85,20 @@ def header():
                             st.session_state.current_response = response
                             logger.info(f"Agent initial response received: {response.model_dump(exclude={'image_s3', 'audio_s3'})}") # Avoid logging potentially large fields
                             # Add initial agent response to messages
-                        st.rerun() # Rerun to update layout based on new state
                     except Exception as e:
                         logger.error(f"Error initializing or running agent: {e}", exc_info=True)
                         st.error(f"Error initializing or running agent: {e}")
                         st.session_state.exercise_started = False # Allow retry
 
 def render_chat_messages():
+    logging.info("Rendering chat messages called")
     if st.session_state.agent:
         # Display chat messages
         for message in st.session_state.agent.get_message_history():
             with st.chat_message(message["role"], avatar="🧑‍💻" if message["role"] == "user" else "🤖"):
                 st.markdown(message["content"])
+    else:
+        st.markdown("No agent in state")
 
 
 def footer():
@@ -112,5 +113,3 @@ def footer():
         st.session_state.messages = []
         st.session_state.current_response = None
         st.session_state.exercise_started = False
-        st.session_state.input_key += 1 # Reset chat input state
-        st.rerun()

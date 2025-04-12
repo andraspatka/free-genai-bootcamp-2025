@@ -24,4 +24,5 @@ services:
       S3_BUCKET_NAME:
       DEBUG: True
     entrypoint: ["watchfiles", "streamlit run /app/language_agent/frontend/app.py --server.port=8501 --server.address=0.0.0.0", "/app/language_agent"]
+    # entrypoint: ["streamlit", "run", "/app/language_agent/frontend/app.py", "--server.port=8501", "--server.address=0.0.0.0"]
 

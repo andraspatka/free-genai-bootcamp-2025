@@ -14,9 +14,6 @@ def initialize_session_state():
     if 'exercise_started' not in st.session_state:
         st.session_state.exercise_started = False
         logger.info("Session state: 'exercise_started' initialized to False.")
-    if 'input_key' not in st.session_state:
-        st.session_state.input_key = 0 # To reset chat input
-        logger.info("Session state: 'input_key' initialized to 0.")
     if 'difficulty' not in st.session_state:
         st.session_state.difficulty = "easy" # Default difficulty
         logger.info("Session state: 'difficulty' initialized to 'easy'.")
