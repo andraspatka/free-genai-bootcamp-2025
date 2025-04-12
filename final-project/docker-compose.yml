@@ -10,7 +10,8 @@ services:
     volumes:
       # Mount the source code for development (optional, remove for production)
       # Allows code changes without rebuilding image
-      - ./:/app
+      - ./language_agent:/app/language_agent
+      - ./data:/data
     restart: unless-stopped
     env_file:
       - .env
@@ -22,5 +23,5 @@ services:
       AWS_REGION:
       S3_BUCKET_NAME:
       DEBUG: True
-    entrypoint: ['sleep', 'infinity']
+    entrypoint: ["watchfiles", "streamlit run /app/language_agent/frontend/app.py --server.port=8501 --server.address=0.0.0.0", "/app/language_agent"]
 

@@ -142,7 +142,7 @@ class LanguageExerciseAgent(BaseAgent):
                     )
                 )
                 s3_path = s3_result.s3_path
-                with open(generated_image.filename, "wb") as f:
+                with open(f"/data/{generated_image.filename}", "wb") as f:
                     f.write(base64.b64decode(generated_image.image_base64))
 
         return UIOutputSchema(
@@ -156,6 +156,10 @@ class LanguageExerciseAgent(BaseAgent):
         
         if isinstance(response, EasyExerciseAgentOutputSchema):
             print("The response is of type EasyExerciseAgentOutputSchema.")
+            return UIOutputSchema(
+                **response.model_dump(),
+                text_content = response.text_content,
+            )
         elif isinstance(response, MediumExerciseAgentOutputSchema):
             return self._handle_medium_exercise(response)
         elif isinstance(response, HardExerciseAgentOutputSchema):
@@ -214,6 +218,7 @@ def debug():
     print("⏳ Waiting for debugger to attach at 0.0.0.0:5678...")
     debugpy.wait_for_client()
     print("🔍 Debugger attached! Starting application...")
+
 
 if __name__ == '__main__':
     if os.environ["DEBUG"]:

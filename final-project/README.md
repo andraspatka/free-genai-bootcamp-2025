@@ -99,6 +99,15 @@ erDiagram
   - iac: terraform code to deploy to AWS
 - scripts: shell scripts for the application
 
+### Frontend
+
+The frontend should be flexible and include multiple components which could be used for every exercise type.
+It should contain 3 panels:
+- One header pannel which contains the input for the exercise: Difficulty (easy, medium, hard), topic (string) and a generate button
+- There should be 1 panel after that for easy exercises or 2 panels side-by-side for medium or hard exercises.
+- The first panel should be the conversation history and the agent's text output. The first panel should be as wide as the screen in case of the first exercise, or half the width of the screen in case of medium or hard exercises, in that case it should be aligned to the left.
+- The second panel should contain the additional learning resources in case of medium or hard exercises, in that case it should be aligned to the right. The additional resources in case of medium exercise: an image view box, in case of a hard exercise: audio streaming box and below that a quiz component.
+
 
 ### Examples of exercises
 
@@ -200,4 +209,4 @@ graph TD
 - I (preemptively) added some guardrails so the agent doesn't output the AWS secrets and OpenAI API keys. As the user can send the agent free text, this poses a potential security concern, as the user could input anything they want, and could potentially get the agent to divulge information that it shouldn't.
 - As I was making no progress in forcing the agent to use the tools, I turned to using multiple smaller agents. The task needs to be more specific, as otherwise the agent gets lost and starts hallucinating.
 - After reducing the agent's scope and splitting it into easy, medium and hard exercise generators, I realized that the agent was still not using any of the defined tools. The reason for this is that I misunderstood the way that the framework works. In a reddit thread the framework developer explained this like so: "Tools and messages are exactly the same in Atomic Agents, it's all Input->Output, the only difference in Atomic Agents is that some times you choose to print or return that output, and some times you decide, using your code, that it is a schema for a tool... I hope that helps debugging, it is kind of a mindset shift that makes you write your code in such a way that makes the code more debuggable step-by-step including tool calls and parameters like you ask" ([source](https://www.reddit.com/r/AtomicAgents/comments/1jnflla/atomic_agents_showcase_song_lyric_to_vocabulary/)). I was expecting the framework to magically take care of calling the tools and chaining them together, but this is not how it works. The framework is made intentionally to be lightweight and simple, so tools calling has to be handled by the code and not by the agent.
-- After changing the schemas so that the agent output is a tool input, and then calling the tools via code, it started working. This is the correct way to use the framework, as the agent doesn't need to know about the tools, it only needs to know about the output schema.
+- After changing the schemas so that the agent output is a tool input, and then calling the tools via code, it started working. This is the correct way to use the framework, as the agent doesn't need to know about the tools, it only needs to know about the output schema, which can be used for calling the tools.

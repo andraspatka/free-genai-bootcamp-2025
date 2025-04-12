@@ -21,7 +21,7 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
 # Debug configs
-RUN pip install debugpy
+RUN pip install debugpy watchfiles
 
 # Copy the rest of the application code into the container
 COPY language_agent language_agent
@@ -39,4 +39,4 @@ EXPOSE 8501
 # HEALTHCHECK CMD curl --fail http://localhost:8501/_stcore/health || exit 1
 
 # Run the Streamlit app
-ENTRYPOINT ["streamlit", "run", "frontend/app.py", "--server.port=8501", "--server.address=0.0.0.0"]
+ENTRYPOINT ["streamlit", "run", "language_agent/frontend/app.py", "--server.port=8501", "--server.address=0.0.0.0"]
