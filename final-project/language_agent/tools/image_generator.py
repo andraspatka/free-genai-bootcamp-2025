@@ -25,9 +25,7 @@ class ImageGeneratorToolInputSchema(BaseModel):
 ####################
 class ImageGeneratorToolOutputSchema(BaseModel):
     """Output schema for the Image Generator tool."""
-    success: bool = Field(..., description="Whether the image generation was successful")
-    message: str = Field(..., description="Status message about the image generation")
-    image_base64: Optional[str] = Field(None, description="Base64 encoded string of the generated image")
+    image_base64: str = Field(..., description="Base64 encoded string of the generated image")
 
 ##############
 # TOOL LOGIC #
