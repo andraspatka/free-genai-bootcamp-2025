@@ -2,10 +2,20 @@
 
 ## 🎥 DEMO
 
-- [Technical specification and business use case](https://www.loom.com/share/820b38982a5546fda18083adcd4a518d?sid=578e4fc6-9140-4587-8a29-d18d394fb1cc)
-- [Application demo: easy exercise](https://www.loom.com/share/66d45dd973654942a971cfa8c2ff0b26?sid=7468b108-f1ec-40ed-a989-fff96a0906b3)
-- [Application demo: medium exercise](https://www.loom.com/share/398320e7f3f94a5c8649b82bb4ce4494?sid=e42f2f14-7daf-4dc4-ab2a-f97fed6e7977)
-- [Application demo: hard exercise](https://www.loom.com/share/c34900615bea4e88b463348b2df99d26?sid=a7fd7bc5-9675-4eee-a4a9-dcd49d991731)
+### Technical specification and business use case
+[![Technical specification and business use case](https://cdn.loom.com/sessions/thumbnails/820b38982a5546fda18083adcd4a518d-with-play.gif)](https://www.loom.com/share/820b38982a5546fda18083adcd4a518d?sid=578e4fc6-9140-4587-8a29-d18d394fb1cc)
+
+### Application demo: easy exercise
+[![Application demo: easy exercise](https://cdn.loom.com/sessions/thumbnails/66d45dd973654942a971cfa8c2ff0b26-with-play.gif)](https://www.loom.com/share/66d45dd973654942a971cfa8c2ff0b26?sid=7468b108-f1ec-40ed-a989-fff96a0906b3)
+
+### Application demo: medium exercise
+[![Application demo: medium exercise](https://cdn.loom.com/sessions/thumbnails/398320e7f3f94a5c8649b82bb4ce4494-with-play.gif)](https://www.loom.com/share/398320e7f3f94a5c8649b82bb4ce4494?sid=e42f2f14-7daf-4dc4-ab2a-f97fed6e7977)
+
+### Application demo: hard exercise
+[![Application demo: hard exercise](https://cdn.loom.com/sessions/thumbnails/c34900615bea4e88b463348b2df99d26-with-play.gif)](https://www.loom.com/share/c34900615bea4e88b463348b2df99d26?sid=a7fd7bc5-9675-4eee-a4a9-dcd49d991731)
+
+### Bonus! Atomic agents strength: schema validation
+[![Bonus! Atomic agents strength: schema validation](https://cdn.loom.com/sessions/thumbnails/fb11c20df0d04cada82c45ed2e86373f-with-play.gif)](https://www.loom.com/share/fb11c20df0d04cada82c45ed2e86373f?sid=8fd803e4-ad7f-4853-b2a2-3bda039c5d35)
 
 ## Prerequisites for running the project locally
 
