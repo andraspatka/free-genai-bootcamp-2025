@@ -6,6 +6,7 @@ from typing import Optional
 
 import boto3
 from pydantic import Field
+import mimetypes
 
 from atomic_agents.agents.base_agent import BaseIOSchema
 from atomic_agents.lib.base.base_tool import BaseTool, BaseToolConfig
@@ -30,10 +31,7 @@ class S3UploaderToolInputSchema(BaseIOSchema):
         ..., 
         description="The name of the file to be saved in S3"
     )
-    content_type: Optional[str] = Field(
-        None,
-        description="The content type (MIME type) of the file. If not provided, will be guessed from the filename."
-    )
+
 
 ####################
 # OUTPUT SCHEMA(S) #
@@ -112,20 +110,6 @@ class S3UploaderTool(BaseTool):
             logger.error(f"Error saving base64 content to file: {str(e)}")
             raise ValueError(f"Invalid base64 content: {str(e)}")
 
-    def _guess_content_type(self, filename: str) -> str:
-        """
-        Guess the content type from the filename extension.
-        
-        Args:
-            filename (str): The name of the file
-            
-        Returns:
-            str: The guessed content type
-        """
-        import mimetypes
-        content_type, _ = mimetypes.guess_type(filename)
-        return content_type or 'application/octet-stream'
-
     def run(self, params: S3UploaderToolInputSchema) -> S3UploaderToolOutputSchema:
         """
         Run the S3 upload operation.
@@ -146,16 +130,12 @@ class S3UploaderTool(BaseTool):
                 params.filename
             )
             
-            # Determine content type
-            content_type = params.content_type or self._guess_content_type(params.filename)
-            
             try:
                 # Upload to S3
                 self.s3_client.upload_file(
                     temp_file_path,
                     self.bucket_name,
                     params.filename,
-                    ExtraArgs={'ContentType': content_type}
                 )
                 
                 # Construct the S3 path
@@ -182,10 +162,6 @@ class S3UploaderTool(BaseTool):
                 s3_path=None
             )
 
-
-#################
-# EXAMPLE USAGE #
-#################
 if __name__ == "__main__":
     # Create sample base64 content
     sample_content = "Hello, World!"

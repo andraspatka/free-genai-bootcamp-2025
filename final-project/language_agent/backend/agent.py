@@ -1,28 +1,36 @@
 import os
 import logging
 from typing import Literal
-
-from atomic_agents.agents.base_agent import BaseAgent, BaseAgentConfig
-
 import instructor
 import openai
+import base64
 
+from atomic_agents.agents.base_agent import BaseAgent, BaseAgentConfig
 from atomic_agents.lib.components.system_prompt_generator import SystemPromptGenerator
 from atomic_agents.lib.components.agent_memory import AgentMemory
 
 from language_agent.backend.config import AgentConfig
-from language_agent.backend.schemas import AgentInputSchema, EasyExerciseAgentOutputSchema, MediumExerciseAgentOutputSchema, HardExerciseAgentOutputSchema
+from language_agent.backend.schemas import (
+    AgentInputSchema,
+    EasyExerciseAgentOutputSchema,
+    MediumExerciseAgentOutputSchema,
+    HardExerciseAgentOutputSchema,
+    UIOutputSchema,
+)
 from language_agent.tools import (
     DuckDuckGoSearchTool,
     PageContentGetterTool,
     ExtractVocabularyTool,
     S3UploaderTool,
     S3UploaderToolConfig,
+    S3UploaderToolInputSchema,
     S3DownloaderTool,
     S3DownloaderToolConfig,
     ImageGeneratorTool,
     ImageGeneratorToolConfig
 )
+
+
 
 
 # Configure logging
@@ -78,10 +86,9 @@ class LanguageExerciseAgent(BaseAgent):
                 "The user has requested a medium exercise. This means that the exercise will include an image."
                 "Analyze the user's request (topic, language, context).",
                 "Example exercises could be: Image description - Provide a generated image to the user and ask them to describe it.",
-                "Generate an image with the tools at your disposal.",
-                "Provide feedback to the user about how they are doing.",
-                "If the exercise requires user input, then ask for it.",
-                "You can use the available tools to generate out the image and to upload it to S3."
+                "Generate only one image at the beginning.",
+                "After that wait for the user to give their inputs.",
+                "Provide feedback based on the user's input to let them know if they are correct.",
             ]
         elif self.difficulty == "hard":
             return [
@@ -121,6 +128,43 @@ class LanguageExerciseAgent(BaseAgent):
         logger.info("LanguageExerciseAgent initialized.")
 
 
+    def _handle_medium_exercise(self, response: MediumExerciseAgentOutputSchema) -> UIOutputSchema:
+        print("The response is of type MediumExerciseAgentOutputSchema.")
+        s3_path = None
+        if response.image_generator_tool_input:
+            generated_image = self.image_generator_tool.run(response.image_generator_tool_input)
+
+            if generated_image:
+                s3_result = self.s3_uploader_tool.run(
+                    S3UploaderToolInputSchema(
+                        base64_content=generated_image.image_base64,
+                        filename=generated_image.filename
+                    )
+                )
+                s3_path = s3_result.s3_path
+                with open(generated_image.filename, "wb") as f:
+                    f.write(base64.b64decode(generated_image.image_base64))
+
+        return UIOutputSchema(
+            **response.model_dump(),
+            image_s3=s3_path,
+        )
+    
+
+    def run(self, input: AgentInputSchema) -> UIOutputSchema:
+        response = super().run(input)
+        
+        if isinstance(response, EasyExerciseAgentOutputSchema):
+            print("The response is of type EasyExerciseAgentOutputSchema.")
+        elif isinstance(response, MediumExerciseAgentOutputSchema):
+            return self._handle_medium_exercise(response)
+        elif isinstance(response, HardExerciseAgentOutputSchema):
+            print("The response is of type HardExerciseAgentOutputSchema.")
+        else:
+            print("The response type is unknown.")
+            raise ValueError("Unknown response type.")
+
+
     def clear_memory(self):
         self.memory.history = []
         self.memory.current_turn_id = None
@@ -139,42 +183,23 @@ def main():
     
     logger.info("Running agent example...")
 
-    # 1. Initialize the agent
     agent = LanguageExerciseAgent(difficulty="medium")
 
-    # 2. Define the initial request
-    initial_request = AgentInputSchema(
+    request = AgentInputSchema(
         topic="Story about Adam and Eve",
         target_language="Italian"
     )
 
-    # 3. Run the agent for the first time
-    response = agent.run(initial_request)
-
-    import base64
 
     while True:
+        response = agent.run(request)
         console.print(f"\n[bold]Agent: {response.model_dump()}[/bold]")
         
-        # Assuming `response` is the object returned by the agent
-        if isinstance(response, EasyExerciseAgentOutputSchema):
-            print("The response is of type EasyExerciseAgentOutputSchema.")
-        elif isinstance(response, MediumExerciseAgentOutputSchema):
-            print("The response is of type MediumExerciseAgentOutputSchema.")
-            generated_image = agent.image_generator_tool.run(response.image_generator_tool_input)
-
-            if generated_image:
-                with open("image.png", "wb") as f:
-                    f.write(base64.b64decode(generated_image.image_base64))
-        elif isinstance(response, HardExerciseAgentOutputSchema):
-            print("The response is of type HardExerciseAgentOutputSchema.")
-        else:
-            print("The response type is unknown.")
         try:
             user_message = console.input("\n[bold blue]Your question:[/bold blue] ").strip()
 
             agent_input = AgentInputSchema(
-                follow_up=user_message,
+                user_input=user_message,
                 target_language=AgentConfig.target_language,
                 topic="",
             )

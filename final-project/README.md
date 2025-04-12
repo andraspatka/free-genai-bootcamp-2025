@@ -38,7 +38,7 @@
   - AWS
   - OpenAI
 
-### Database schema
+### Database schema - REMOVED FROM V1
 
 Story:
 - id: uuid

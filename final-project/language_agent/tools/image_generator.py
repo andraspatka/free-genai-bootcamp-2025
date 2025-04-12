@@ -7,9 +7,7 @@ from pydantic import BaseModel, Field
 
 logger = logging.getLogger(__name__)
 
-####################
-# INPUT SCHEMA(S)  #
-####################
+
 class ImageGeneratorToolInputSchema(BaseModel):
     """ 
     Schema for input to a tool for generating images using OpenAI's API.
@@ -19,20 +17,22 @@ class ImageGeneratorToolInputSchema(BaseModel):
         ..., 
         description="A text string detailing the image to be generated"
     )
+    descriptive_filename: str = Field(
+        ..., 
+        description="A descriptive filename for the generated image. Should contain no whitespaces, words should be separated by underscore(_). File extension should be .png every time."
+    )
 
-####################
-# OUTPUT SCHEMA(S) #
-####################
+
 class ImageGeneratorToolOutputSchema(BaseModel):
     """Output schema for the Image Generator tool."""
     image_base64: str = Field(..., description="Base64 encoded string of the generated image")
+    filename: str = Field(..., description="The descriptive filename of the generated image")
 
-##############
-# TOOL LOGIC #
-##############
+
 class ImageGeneratorToolConfig(BaseModel):
     """Configuration for the Image Generator Tool."""
     openai_api_key: str = Field(..., description="API key for accessing OpenAI services")
+
 
 class ImageGeneratorTool:
     """Tool for generating images using OpenAI's API.
@@ -48,12 +48,14 @@ class ImageGeneratorTool:
     input_schema = ImageGeneratorToolInputSchema
     output_schema = ImageGeneratorToolOutputSchema
 
+
     def __init__(self, config: ImageGeneratorToolConfig):
         """Initialize the ImageGeneratorTool with configuration."""
         self.config = config
         
         # Set OpenAI API key
         self.client = OpenAI(api_key=config.openai_api_key)
+
 
     def run(self, params: ImageGeneratorToolInputSchema) -> ImageGeneratorToolOutputSchema:
         """
@@ -81,9 +83,8 @@ class ImageGeneratorTool:
             image_base64 = response.data[0].b64_json
             
             return ImageGeneratorToolOutputSchema(
-                success=True,
-                message="Image successfully generated",
-                image_base64=image_base64
+                image_base64=image_base64,
+                filename=params.descriptive_filename
             )
             
         except Exception as e:
@@ -108,7 +109,8 @@ if __name__ == "__main__":
     
     # Create sample input
     input_params = ImageGeneratorToolInputSchema(
-        description="A futuristic cityscape at sunset"
+        description="A futuristic cityscape at sunset",
+        descriptive_filename="futuristic_cityscape_at_sunset.png"
     )
     
     # Run the tool
@@ -116,9 +118,8 @@ if __name__ == "__main__":
     print(result.model_dump_json(indent=2)[0:50])
 
     # Save the image to a file if generation was successful
-    if result.success and result.image_base64:
+    if result.image_base64:
         image_data = base64.b64decode(result.image_base64)
-        image_path = "generated_image.png"
-        with open(image_path, "wb") as image_file:
+        with open(result.filename, "wb") as image_file:
             image_file.write(image_data)
-        print(f"Image saved to {image_path}")
+        print(f"Image saved to {result.filename}")
