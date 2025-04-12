@@ -10,3 +10,4 @@ youtube-transcript-api>=1.0.3,<2.0.0
 duckduckgo-search==7.5.5
 instructor==1.7.7
 html2text==2024.2.26
+pillow==11.1.0

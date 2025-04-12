@@ -5,6 +5,8 @@ import tempfile
 from typing import Optional
 from pydantic import BaseModel, Field
 
+import base64
+
 logger = logging.getLogger(__name__)
 
 ####################
@@ -40,8 +42,7 @@ class S3DownloaderToolConfig(BaseModel):
 class S3DownloaderTool:
     """Tool for downloading files from S3.
     
-    This tool takes an S3 path, downloads the content, and saves it to
-    either a specified local directory or a temporary directory.
+    This tool takes an S3 path, downloads the content and returns the file contents as base64 encoded string.
     
     Attributes:
         input_schema (S3DownloaderToolInputSchema): The schema for the input data
@@ -105,29 +106,20 @@ class S3DownloaderTool:
             # Parse S3 path
             bucket_name, object_key = self._parse_s3_path(params.s3_path)
             
-            # Get filename from object key
-            filename = os.path.basename(object_key)
-            
             # Determine local directory
-            if params.local_directory:
-                local_dir = params.local_directory
-                os.makedirs(local_dir, exist_ok=True)
-            else:
-                local_dir = tempfile.mkdtemp()
+            with tempfile.NamedTemporaryFile() as temp_file:
+                local_path = temp_file.name
             
-            # Construct local file path
-            local_path = os.path.join(local_dir, filename)
-            
-            # Download the file
-            self.s3_client.download_file(
-                bucket_name,
-                object_key,
-                local_path
-            )
-            
-            # Read the image file and encode it in base64
-            with open(local_path, "rb") as f:
-                image_base64 = base64.b64encode(f.read()).decode('utf-8')
+                # Download the file
+                self.s3_client.download_file(
+                    bucket_name,
+                    object_key,
+                    local_path
+                )
+                
+                # Read the image file and encode it in base64
+                with open(local_path, "rb") as f:
+                    image_base64 = base64.b64encode(f.read()).decode('utf-8')
             
             return S3DownloaderToolOutputSchema(
                 success=True,
@@ -161,7 +153,7 @@ if __name__ == "__main__":
     
     # Create sample input
     upload_input = S3DownloaderToolInputSchema(
-        s3_path=f"s3://{bucket}/test.txt"
+        s3_path=f"s3://{bucket}/adam_and_eve_garden_of_eden.png"
     )
     
     # Run the tool

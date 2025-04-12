@@ -20,3 +20,9 @@ def initialize_session_state():
     if 'topic' not in st.session_state:
         st.session_state.topic = "" # Default topic
         logger.info("Session state: 'topic' initialized to empty string.")
+    if 'image' not in st.session_state:
+        st.session_state.image = None
+        logger.info("Session state: 'image' initialized to None.")
+    if 'audio' not in st.session_state:
+        st.session_state.audio = None
+        logger.info("Session state: 'audio' initialized to None.")
