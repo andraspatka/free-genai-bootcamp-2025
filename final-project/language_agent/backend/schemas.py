@@ -24,7 +24,7 @@ class QuizOptionSchema(BaseIOSchema):
 class QuizSchema(BaseIOSchema):
     """Schema representing a quiz question and answer and possible options."""
     question: str = Field(..., description="The question of the quiz.")
-    options: Optional[List[QuizOptionSchema]] = Field(None, description="Optional list of answer options for the quiz question.")
+    options: Optional[List[QuizOptionSchema]] = Field(None, description="Optional list of answer options for the quiz question. Generate at least 4 options.")
 
 
 class AgentOutputSchema(BaseIOSchema):
@@ -62,7 +62,7 @@ class HardExerciseAgentOutputSchema(AgentOutputSchema):
     """
     difficulty: Literal["hard"]
     audio_generator_tool_input: Optional[AudioGeneratorToolInputSchema] = Field(None, description="Input to the AudioGeneratorTool. The tool will take the input and use text to speech to generate out audio. The audio should be generated once at the beginning only.")
-    quiz: Optional[List[QuizSchema]] = Field(None, description="List of quiz questions, if the exercise is a quiz.")
+    quiz: List[QuizSchema] = Field(..., min_length=4, max_length=4, description="List of quiz questions, if the exercise is a quiz. Generate 4 questions.")
 
 # TODO: Add validation using pydantic validators
 class UIOutputSchema(AgentOutputSchema):
@@ -72,4 +72,4 @@ class UIOutputSchema(AgentOutputSchema):
     text_content: Optional[str] = Field(None, description="Text content for the exercise.")
     image_s3: Optional[str] = Field(None, description="S3 URL of the generated image.")
     audio_s3: Optional[str] = Field(None, description="S3 URL of the generated audio.")
-    quiz: Optional[List[QuizSchema]] = Field(None, description="List of quiz questions, if the exercise is a quiz.")
+    quiz: Optional[List[QuizSchema]] = Field(None, description="List of quiz questions, if the exercise is a quiz. Generate 4 questions.")
