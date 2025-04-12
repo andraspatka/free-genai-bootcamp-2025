@@ -12,15 +12,11 @@ logger = logging.getLogger(__name__)
 ####################
 class S3DownloaderToolInputSchema(BaseModel):
     """Schema for input to a tool for downloading files from S3.
-    Takes an S3 path and downloads the file to a local directory.
+    Takes an S3 path and downloads the file to a temporary file, then it returns the base64 encoded image data.
     """
     s3_path: str = Field(
         ..., 
         description="The S3 path of the file to download (format: s3://bucket-name/path/to/file)"
-    )
-    local_directory: Optional[str] = Field(
-        None,
-        description="Optional local directory to save the file. If not provided, a temporary directory will be used."
     )
 
 ####################
@@ -30,7 +26,7 @@ class S3DownloaderToolOutputSchema(BaseModel):
     """Output schema for the S3 Downloader tool."""
     success: bool = Field(..., description="Whether the download was successful")
     message: str = Field(..., description="Status message about the download")
-    local_path: Optional[str] = Field(None, description="The full local path where the file was downloaded")
+    image_base64: Optional[str] = Field(None, description="The base64 encoded image data")
 
 ##############
 # TOOL LOGIC #
@@ -129,10 +125,14 @@ class S3DownloaderTool:
                 local_path
             )
             
+            # Read the image file and encode it in base64
+            with open(local_path, "rb") as f:
+                image_base64 = base64.b64encode(f.read()).decode('utf-8')
+            
             return S3DownloaderToolOutputSchema(
                 success=True,
                 message=f"File successfully downloaded to {local_path}",
-                local_path=local_path
+                image_base64=image_base64
             )
             
         except Exception as e:
