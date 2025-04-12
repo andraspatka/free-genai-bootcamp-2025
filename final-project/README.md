@@ -1,5 +1,17 @@
 # Final project
 
+## Prerequisites for running the project locally
+
+- Docker
+- Docker compose
+- Existing AWS S3 bucket
+- AWS credentials
+- OpenAI API key
+
+The file `.env` has to be created based on `env.template`. After that the project can be started with `make start`.
+
+The application will be available on `http://localhost:8501`.
+
 ## Business use case
 
 - Create an agent which is capable of generating out learning exercises for language learning
@@ -211,3 +223,9 @@ graph TD
 - After reducing the agent's scope and splitting it into easy, medium and hard exercise generators, I realized that the agent was still not using any of the defined tools. The reason for this is that I misunderstood the way that the framework works. In a reddit thread the framework developer explained this like so: "Tools and messages are exactly the same in Atomic Agents, it's all Input->Output, the only difference in Atomic Agents is that some times you choose to print or return that output, and some times you decide, using your code, that it is a schema for a tool... I hope that helps debugging, it is kind of a mindset shift that makes you write your code in such a way that makes the code more debuggable step-by-step including tool calls and parameters like you ask" ([source](https://www.reddit.com/r/AtomicAgents/comments/1jnflla/atomic_agents_showcase_song_lyric_to_vocabulary/)). I was expecting the framework to magically take care of calling the tools and chaining them together, but this is not how it works. The framework is made intentionally to be lightweight and simple, so tools calling has to be handled by the code and not by the agent.
 - After changing the schemas so that the agent output is a tool input, and then calling the tools via code, it started working. This is the correct way to use the framework, as the agent doesn't need to know about the tools, it only needs to know about the output schema, which can be used for calling the tools.
 - Once I got the tool calling right, the rest of the steps were easier. 
+- The project is functional but the scope is much smaller than I had intended at the moment (2025.04.12). The following works:
+  - Easy exercise: The agent generates an easy exercise. No tools are used. The user can respond and the agent evaluates the response
+  - Medium exercise: The agent comes up with an exercise that requires an image. The agent generates the prompt for the image generator. The image generator is used (OpenAI) and then the image is also uploaded to S3
+  - Hard exercise: The agent comes up with an exercise that requires audio and can be evaluated using a quiz. The agent generates a situation based on the topic and this is fed into the Audio generator. The audio generator is used (Amazon Polly) and then the audio is also uploaded to S3
+- I tried to split the UI into smaller manageable pieces, but the code is still hard to understand. It will need further refactoring.
+- Demo video will come soon!
